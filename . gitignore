@@ -4,6 +4,8 @@ Thumbs.db
 
 # Ignore les répertoires node_modules créés par npm
 node_modules/
+/node_modules
+
 
 # Ignore les fichiers de configuration d'éditeur
 .vscode/
