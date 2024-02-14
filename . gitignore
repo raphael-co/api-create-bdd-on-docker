@@ -28,3 +28,4 @@ logs/
 
 # Ignore les dépendances installées
 package-lock.json
+.package-lock.json
