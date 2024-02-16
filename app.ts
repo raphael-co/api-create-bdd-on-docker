@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from "dotenv"
+import routes from './src/routes/routes';
 // import * as http from 'http';
 // import { Server } from "socket.io";
 
@@ -38,6 +39,8 @@ app.use(express.json());
 
 
 // server.listen(process.env.PORT || 4000);
+
+app.use('/', routes);
 
 app.get('/', async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).send({
