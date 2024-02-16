@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import BDDServices from '../service/bdd/bdd';
+import BDDServices from '../services/BDDServices/BDDServices';
 import validateBddInput from '../middlewares/bdd/validateBddInput';
 import { Request, Response } from 'express';
 

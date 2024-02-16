@@ -1,4 +1,4 @@
-const genereateusername = (name : string,type: string,Database : string) => {
+const generateUsername = (name: string, type: string, Database: string) => {
     let result = name + type + Database;
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
@@ -7,4 +7,8 @@ const genereateusername = (name : string,type: string,Database : string) => {
     }
     return result;
 }
-export default genereateusername;  
+export default generateUsername;
+
+function test() {
+    return true
+}

@@ -1,9 +1,4 @@
-import { Request, Response } from 'express';
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import * as mysql from 'mysql';
-import conn from '../../config/dbConnection';
-
-import { createCipheriv, createDecipheriv, randomBytes, CipherGCMTypes } from 'crypto';
+import { createCipheriv, createDecipheriv, CipherGCMTypes } from 'crypto';
 
 export interface EncryptedData {
     encrypted: string;
@@ -12,7 +7,6 @@ export interface EncryptedData {
 }
 
 class Cryptage {
-
     static encrypt(text: string | Buffer, secretKey: Buffer, iv: Buffer): EncryptedData {
         const cipher = createCipheriv('aes-256-gcm' as CipherGCMTypes, secretKey, iv);
         let encrypted: string;
@@ -37,7 +31,6 @@ class Cryptage {
         decrypted += decipher.final('utf8');
         return decrypted; // Renvoie la chaîne décryptée
     }
-
 }
 
 export default Cryptage;
