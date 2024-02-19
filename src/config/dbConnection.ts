@@ -9,7 +9,7 @@ async function createDatabaseConnection() {
     socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
   });
 
-  console.log('Database is connected successfully!');
+  console.log('Database bddStokage is connected successfully!');
   return connection;
 }
 

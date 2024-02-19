@@ -9,7 +9,7 @@ async function createDatabaseSecretKeyConnection() {
     socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock',
   });
 
-  console.log('Database is connected successfully!');
+  console.log('Database secret-Key is connected successfully!');
   return connection;
 }
 
