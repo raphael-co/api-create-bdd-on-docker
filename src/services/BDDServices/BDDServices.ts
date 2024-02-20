@@ -19,7 +19,7 @@ class BDDServices {
         });
     };
 
-    static async deleteBddwithId(id: number) {
+    static async deleteBddwithId(id: number, userid: number) {
         let secretKey: EncryptedData = {
             encrypted: '',
             iv: '',
@@ -54,7 +54,7 @@ class BDDServices {
         try {
             // Retrieve the BDD info using DatabaseService
             const [rows] = await DatabaseService.queryDatabase(
-                `SELECT * FROM bddInfo WHERE id = ?`, [id]
+                `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
 
             if (rows.length === 0) {
@@ -68,13 +68,13 @@ class BDDServices {
             await DockerService.removeContainer(containerId);
 
             // Delete entries from databases
+
+            await DatabaseService.queryDatabase(
+                `DELETE FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
+            );
             await DatabaseService.querySecretDatabase(
                 `DELETE FROM secretKey WHERE idBdd = ?`, [id]
             );
-            await DatabaseService.queryDatabase(
-                `DELETE FROM bddInfo WHERE id = ?`, [id]
-            );
-
             return {
                 ok: "ok",
                 data: `La base de données a bien été supprimée`
@@ -88,7 +88,7 @@ class BDDServices {
         }
     }
 
-    static async getBddwithId(id: number) {
+    static async getBddwithId(id: number, userid: number) {
         let secretKey: EncryptedData = {
             encrypted: '',
             iv: '',
@@ -99,7 +99,7 @@ class BDDServices {
             const [rows] = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [id]
             );
-            
+
             if (rows.length === 0) throw new Error('Secret key not found.');
             secretKey = JSON.parse(rows[0].secretKey);
         } catch (error) {
@@ -120,7 +120,7 @@ class BDDServices {
 
         try {
             const [rows] = await DatabaseService.queryDatabase(
-                `SELECT * FROM bddInfo WHERE id = ?`, [id]
+                `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
             if (rows.length === 0) throw new Error('Database info not found.');
 
@@ -152,7 +152,69 @@ class BDDServices {
         }
     }
 
-    static createBDD = async (BddData: any) => {
+    static async getAllBdd(userid: number) {
+        try {
+            // Récupérer toutes les entrées de bddInfo pour le userid donné
+            const [rows] = await DatabaseService.queryDatabase(
+                `SELECT * FROM bddInfo WHERE UserId = ?`, [userid]
+            );
+
+            if (rows.length === 0) {
+                // Aucune base de données trouvée pour cet utilisateur
+                return {
+                    ok: "ok",
+                    message: "No databases found for the given user.",
+                    data: []
+                };
+            }
+
+            // Décrypter les informations de chaque base de données
+            const bdds = await Promise.all(rows.map(async (row: { id: any; Name: string; Type: string; DatabaseName: string; Username: string; Password: string; ContainerId: string; Port: string; Host: string; }) => {
+                // Récupérer et décrypter la clé secrète pour cette entrée de base de données
+                const [secretRows] = await DatabaseService.querySecretDatabase(
+                    `SELECT * FROM secretKey WHERE idBdd = ?`, [row.id]
+                );
+                if (secretRows.length === 0) {
+                    throw new Error(`Secret key not found for database with ID ${row.id}.`);
+                }
+
+                const secretKeyData: EncryptedData = JSON.parse(secretRows[0].secretKey);
+                if (typeof process.env.SECRET_KEY === 'undefined') {
+                    throw new Error('SECRET_KEY is not defined in the environment variables');
+                }
+                const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
+                const decryptedSecretKey = Cryptage.decrypt(secretKeyData, secretKeyBuffer);
+
+                // Utiliser la clé secrète décryptée pour décrypter les informations de la base de données
+                const keyBuffer = Buffer.from(JSON.parse(decryptedSecretKey).data);
+                return {
+                    id: row.id,
+                    Name: Cryptage.decrypt(JSON.parse(row.Name), keyBuffer),
+                    Type: Cryptage.decrypt(JSON.parse(row.Type), keyBuffer),
+                    DatabaseName: Cryptage.decrypt(JSON.parse(row.DatabaseName), keyBuffer),
+                    Username: Cryptage.decrypt(JSON.parse(row.Username), keyBuffer),
+                    Password: Cryptage.decrypt(JSON.parse(row.Password), keyBuffer),
+                    ContainerId: Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer),
+                    Port: JSON.parse(row.Port),
+                    Host: Cryptage.decrypt(JSON.parse(row.Host), keyBuffer)
+                };
+            }));
+
+            return {
+                ok: "ok",
+                data: bdds
+            };
+        } catch (error) {
+            console.error('Error:', error);
+            return {
+                ok: "error",
+                message: error instanceof Error ? error.message : 'An unknown error occurred'
+            };
+        }
+    }
+
+
+    static createBDD = async (BddData: any, userid: number) => {
         const { name, type, databaseName } = BddData;
         const genereatePasswordString = genereatePassword();
         const generateUsernameString = genereateusername(name, type, databaseName);
@@ -179,21 +241,23 @@ class BDDServices {
                 Database: databaseName,
                 Username: generateUsernameString,
                 Password: genereatePasswordString,
-                ContainerId: result
+                ContainerId: await result,
+                userid: userid
             };
 
             const values = [
+                userid,
                 JSON.stringify(Cryptage.encrypt(dbInfo.Username, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Password, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Database, secretKey, iv)),
                 dbInfo.Port,
                 JSON.stringify(Cryptage.encrypt(dbInfo.Host, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Type, secretKey, iv)),
-                JSON.stringify(Cryptage.encrypt(await dbInfo.ContainerId, secretKey, iv)),
+                JSON.stringify(Cryptage.encrypt(dbInfo.ContainerId, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Name, secretKey, iv))
             ];
 
-            const query = `INSERT INTO bddInfo (Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)`;
 
             // Using DatabaseService for the main database operation
             const [insertResults] = await DatabaseService.queryDatabase(query, values);

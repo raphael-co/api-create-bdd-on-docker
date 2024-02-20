@@ -13,7 +13,8 @@ class JsonwebtokenController {
     static verifyJwtToken(token: string) {
         const secretKey = process.env.JWT_SECRET_KEY;
         try {
-            const decoded = jwt.verify(token, secretKey);
+            const tokenNoBearer = token.split(' ')[1]
+            const decoded = jwt.verify(tokenNoBearer, secretKey);
             return { valid: true, decoded };
         } catch (error) {
             console.error((error as Error).message);

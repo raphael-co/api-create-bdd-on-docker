@@ -1,5 +1,4 @@
-import HashPassword from "../../../src/middlewares/user/hashPassword";
-
+import HashPassword from "../../../src/middlewares/user/HashPassword";
 
 describe('HashPassword', () => {
   test('hashPassword should return a hash different from the password', async () => {

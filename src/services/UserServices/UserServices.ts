@@ -1,9 +1,10 @@
 // DockerService.ts
 import { exec } from 'child_process';
 import { Request, Response } from 'express';
-import HashPassword from '../../middlewares/user/hashPassword';
 import { DatabaseService } from '../DatabaseService/DatabaseService';
 import JsonwebtokenController from '../../middlewares/user/JsonwebtokenController';
+import HashPassword from '../../middlewares/user/HashPassword';
+import BDDServices from '../BDDServices/BDDServices';
 
 
 export class UserServices {
@@ -15,6 +16,55 @@ export class UserServices {
             message: newPassword,
             token: null,
         });
+    };
+
+    static deleteUser = async (id: number) => {
+
+        try {
+            // Exécuter la requête de suppression
+            const resultAllBdd = await BDDServices.getAllBdd(id);
+
+            // Vérifier si la récupération des bases de données a réussi
+            if (resultAllBdd.ok === "ok" && Array.isArray(resultAllBdd.data)) {
+                // Itérer sur chaque base de données retournée
+                for (const bdd of resultAllBdd.data) {
+                    try {
+                        // Appeler deleteBddwithId pour chaque base de données
+                        const deleteResult = await BDDServices.deleteBddwithId(bdd.id, id);
+                        console.log(deleteResult); // Afficher le résultat de la suppression
+                    } catch (error) {
+                        console.error('Error deleting BDD with ID:', bdd.id, error);
+                        // Gérer l'erreur (par exemple, en arrêtant la boucle, en continuant avec le prochain élément, etc.)
+                    }
+                }
+            } else {
+                console.error('Failed to retrieve BDDs or no BDDs found.');
+            }
+             const [result] = await DatabaseService.queryDatabase(
+                "DELETE FROM `users` WHERE `id` = ?", [id]
+            );
+
+            // Vérifier le succès de l'opération
+            if (result.affectedRows && result.affectedRows > 0) {
+                return {
+                    success: true,
+                    message: "User successfully deleted.",
+                }
+
+            } else {
+                // Aucun utilisateur n'a été trouvé avec cet ID, ou il n'a pas été possible de le supprimer
+                return {
+                    success: false,
+                    message: "User not found or could not be deleted.",
+                };
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            return {
+                success: false,
+                message: "An error occurred while trying to delete the user.",
+            };
+        }
     };
 
     static register = async (userData: any) => {

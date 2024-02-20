@@ -8,7 +8,3 @@ const generateUsername = (name: string, type: string, Database: string) => {
     return result;
 }
 export default generateUsername;
-
-function test() {
-    return true
-}
