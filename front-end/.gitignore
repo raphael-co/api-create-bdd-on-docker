@@ -21,3 +21,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Ignore les dépendances installées
+package-lock.json
+.package-lock.json

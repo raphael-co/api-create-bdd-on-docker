@@ -40,7 +40,7 @@ export class UserServices {
             } else {
                 console.error('Failed to retrieve BDDs or no BDDs found.');
             }
-             const [result] = await DatabaseService.queryDatabase(
+            const [result] = await DatabaseService.queryDatabase(
                 "DELETE FROM `users` WHERE `id` = ?", [id]
             );
 
@@ -124,7 +124,7 @@ export class UserServices {
             if (!passwordMatch) {
                 return {
                     success: false,
-                    message: "Invalid password."
+                    message: "User not found."
                 };
             }
 

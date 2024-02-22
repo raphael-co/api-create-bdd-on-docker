@@ -4,6 +4,7 @@ import validateUserInput from '../middlewares/user/validateUserInput';
 import { UserServices } from '../services/UserServices/UserServices';
 import JsonWebToken from '../middlewares/JsonWebToken/JsonWebToken';
 import JsonwebtokenController from '../middlewares/user/JsonwebtokenController';
+import validateUserInputLogin from '../middlewares/user/validateUserInputLogin';
 
 const user = Router();
 
@@ -12,7 +13,11 @@ user.post('/register', validateUserInput, async (req: Request, res: Response) =>
 
         const user = await UserServices.register(req.body);
 
-        res.status(201).send({ user });
+        if (user.success) {
+            res.status(201).send({ user });
+        } else {
+            res.status(400).send({ user }); 
+        }
     } catch (error: unknown) {
         // Check if the error is an instance of Error
         if (error instanceof Error) {
@@ -24,12 +29,17 @@ user.post('/register', validateUserInput, async (req: Request, res: Response) =>
     }
 });
 
-user.post('/login', validateUserInput, async (req: Request, res: Response) => {
+user.post('/login', validateUserInputLogin, async (req: Request, res: Response) => {
     try {
 
         const user = await UserServices.login(req.body);
 
-        res.status(201).send({ user });
+        if (user.success) {
+            res.status(201).send({ user });
+        } else {
+            res.status(400).send({ user }); 
+        }
+        
     } catch (error: unknown) {
         // Check if the error is an instance of Error
         if (error instanceof Error) {
