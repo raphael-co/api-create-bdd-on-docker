@@ -10,10 +10,10 @@ const hideLoader = () => {
     // Retire la classe 'show', ce qui cache le loader
     document.getElementById('loader').classList.remove('show');
 };
-function showToast(message, type, duration = 3000) {
+export default function showToast(message, type, duration = 3000) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    toast.classList.add('toast', type); 
+    toast.classList.add('toast', type);
     toast.textContent = message;
 
     container.appendChild(toast);
@@ -34,8 +34,8 @@ function showToast(message, type, duration = 3000) {
         });
     }, duration);
 }
-
 export const userService = {
+    
     isAuthenticated() {
         return !!sessionStorage.getItem('authToken');
     },
@@ -94,9 +94,14 @@ export const userService = {
             hideLoader();
         }
     },
-    logout() {
-        // Supprimer le token du sessionStorage lors de la déconnexion
+    logout(router) { // Ajoutez `router` en tant que paramètre
         this.removeToken();
-        // Rediriger l'utilisateur ou faire quelque chose après la déconnexion
+        showToast("Vous avez bien été déconnecté", "success", 5000);
+        router.push({ name: 'LoginPage' });
+    },
+    logoutForce(router) { // Ajoutez `router` en tant que paramètre
+        this.removeToken();
+        showToast("Session expiré", "error", 5000);
+        router.push({ name: 'LoginPage' });
     }
 };

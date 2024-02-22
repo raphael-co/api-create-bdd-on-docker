@@ -11,7 +11,6 @@ const routes = [
         component: HomePage,
         meta: {
             requiresAuth: true,
-            backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         } // Utilisez require pour les assets
     },
     {
@@ -20,7 +19,7 @@ const routes = [
         component: LoginPage,
         meta: {
             requiresAuth: false,
-            backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
+            // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         }
     },
     {
@@ -29,7 +28,7 @@ const routes = [
         component: RegisterPage,
         meta: {
             requiresAuth: false,
-            backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
+            // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         }
     },
 ];
@@ -53,7 +52,7 @@ router.beforeEach((to, from, next) => {
         document.body.style.backgroundRepeat = 'no-repeat';
         document.body.style.backgroundPosition = 'center center';
     } else {
-        document.body.style.backgroundImage = ''; // Appliquer un arrière-plan par défaut ou le supprimer
+        // document.body.style.backgroundImage = ''; // Appliquer un arrière-plan par défaut ou le supprimer
     }
 
     if (isAuthenticated && (to.name === 'LoginPage' || to.name === 'RegisterPage')) {

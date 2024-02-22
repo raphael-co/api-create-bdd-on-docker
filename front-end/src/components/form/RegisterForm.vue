@@ -63,6 +63,22 @@ export default {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
+
+@media (max-width: 900px) {
+  .login-container {
+    max-width: 320px;
+    /* min-height: 100vh; */
+    /* Change la direction de row à column pour les petits écrans */
+  }
+}
+
+@media (max-width: 380px) {
+  .login-container {
+    max-width: 300px;
+    /* min-height: 100vh; */
+    /* Change la direction de row à column pour les petits écrans */
+  }
+}
 h2 {
   color: #333;
   text-align: center;

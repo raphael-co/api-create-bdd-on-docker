@@ -1,22 +1,24 @@
 <template>
-  <div class="register-container">
-
-
-    <RegisterForm />
-
-
-    <cardRegister />
-  </div>
+  <AnimatedBackground>
+    <div class="register-container">
+      <div class="form-container">
+        <RegisterForm />
+        <cardRegister />
+      </div>
+    </div>
+  </AnimatedBackground>
 </template>
   
 <script>
-import RegisterForm from '../components/form/RegisterForm.vue'; // Assurez-vous que le chemin d'importation est correct
-import cardRegister from '../components/card/cardRegister.vue'; // Assurez-vous que le chemin d'importation est correct
+import RegisterForm from '../components/form/RegisterForm.vue';
+import cardRegister from '../components/card/cardRegister.vue';
+import AnimatedBackground from "../components/AnimatedBackground/AnimatedBackground.vue";
 export default {
   name: 'RegisterPage',
   components: {
     RegisterForm,
-    cardRegister
+    cardRegister,
+    AnimatedBackground
   },
   data() {
     return {
@@ -45,8 +47,23 @@ export default {
   min-height: 100vh;
 }
 
+
+
+.form-container {
+
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
 @media (max-width: 900px) {
-  .register-container {
+  .form-container {
     flex-direction: column;
     gap: 20px;
     padding: 20px 0px;
