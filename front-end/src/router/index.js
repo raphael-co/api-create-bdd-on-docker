@@ -3,12 +3,20 @@ import HomePage from '../views/HomePage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import RegisterPage from '../views/RegisterPage.vue';
 import { userService } from '@/request/userService';
-
+import IdBddPage from '../views/IdBddPage.vue';
 const routes = [
     {
         path: '/',
         name: 'HomePage',
         component: HomePage,
+        meta: {
+            requiresAuth: true,
+        } // Utilisez require pour les assets
+    },
+    {
+        path: '/:idBdd',
+        name: 'IdBddPage',
+        component: IdBddPage,
         meta: {
             requiresAuth: true,
         } // Utilisez require pour les assets

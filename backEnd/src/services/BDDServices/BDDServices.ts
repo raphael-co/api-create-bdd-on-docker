@@ -125,6 +125,8 @@ class BDDServices {
             if (rows.length === 0) throw new Error('Database info not found.');
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
+            const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+            const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
 
             const infobdd = {
                 id: rows[0].id,
@@ -135,7 +137,10 @@ class BDDServices {
                 Password: Cryptage.decrypt(JSON.parse(rows[0].Password), keyBuffer),
                 ContainerId: Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer),
                 Port: JSON.parse(rows[0].Port),
-                Host: Cryptage.decrypt(JSON.parse(rows[0].Host), keyBuffer)
+                Host: Cryptage.decrypt(JSON.parse(rows[0].Host), keyBuffer),
+                StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
+                bddRun: bddRun,
+                createAt: rows[0].Create_at
             };
 
             return {
@@ -187,6 +192,8 @@ class BDDServices {
 
                 // Utiliser la clé secrète décryptée pour décrypter les informations de la base de données
                 const keyBuffer = Buffer.from(JSON.parse(decryptedSecretKey).data);
+                const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
+                const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
                 return {
                     id: row.id,
                     Name: Cryptage.decrypt(JSON.parse(row.Name), keyBuffer),
@@ -196,7 +203,10 @@ class BDDServices {
                     Password: Cryptage.decrypt(JSON.parse(row.Password), keyBuffer),
                     ContainerId: Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer),
                     Port: JSON.parse(row.Port),
-                    Host: Cryptage.decrypt(JSON.parse(row.Host), keyBuffer)
+                    Host: Cryptage.decrypt(JSON.parse(row.Host), keyBuffer),
+                    createAt: rows[0].Create_at,
+                    StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
+                    bddRun: bddRun
                 };
             }));
 
@@ -283,6 +293,133 @@ class BDDServices {
                 success: false,
                 message: error instanceof Error ? error.message : String(error),
                 token: null,
+            };
+        }
+    }
+
+
+    static RestartBDD = async (BddData: any, userid: number) => {
+        const { bddId } = BddData;
+
+
+        let secretKey: EncryptedData = {
+            encrypted: '',
+            iv: '',
+            tag: ''
+        };
+
+        try {
+            const [rows] = await DatabaseService.querySecretDatabase(
+                `SELECT * FROM secretKey WHERE idBdd = ?`, [bddId]
+            );
+
+            if (rows.length === 0) throw new Error('Secret key not found.');
+            secretKey = JSON.parse(rows[0].secretKey);
+        } catch (error) {
+            const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
+            console.error('Erreur lors de la récupération des données:', errorMessage);
+            return {
+                ok: "error",
+                message: errorMessage
+            };
+        }
+
+        if (typeof process.env.SECRET_KEY === 'undefined') {
+            throw new Error('SECRET_KEY is not defined in the environment variables');
+        }
+
+        const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
+        const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
+
+        try {
+            const [rows] = await DatabaseService.queryDatabase(
+                `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [bddId, userid]
+            );
+            if (rows.length === 0) throw new Error('Database info not found.');
+
+            const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
+
+            await DockerService.restartContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+
+            return {
+                ok: "ok",
+                data: "Database restarted successfully.",
+            };
+        } catch (error) {
+            const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
+            console.error('Erreur lors de la récupération des données:', errorMessage);
+            return {
+                ok: "error",
+                message: errorMessage
+            };
+        }
+    }
+
+    static BreakBDD = async (BddData: any, userid: number) => {
+        const { bddId, command } = BddData;
+
+        let secretKey: EncryptedData = {
+            encrypted: '',
+            iv: '',
+            tag: ''
+        };
+
+        try {
+            const [rows] = await DatabaseService.querySecretDatabase(
+                `SELECT * FROM secretKey WHERE idBdd = ?`, [bddId]
+            );
+
+            if (rows.length === 0) throw new Error('Secret key not found.');
+            secretKey = JSON.parse(rows[0].secretKey);
+        } catch (error) {
+            const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
+            console.error('Erreur lors de la récupération des données:', errorMessage);
+            return {
+                ok: "error",
+                message: errorMessage
+            };
+        }
+
+        if (typeof process.env.SECRET_KEY === 'undefined') {
+            throw new Error('SECRET_KEY is not defined in the environment variables');
+        }
+
+        const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
+        const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
+
+        try {
+            const [rows] = await DatabaseService.queryDatabase(
+                `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [bddId, userid]
+            );
+            if (rows.length === 0) throw new Error('Database info not found.');
+
+            const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
+
+
+            if (command === "stop") {
+                await DockerService.stopContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+                return {
+                    ok: "ok",
+                    data: "Database stopped successfully.",
+                };
+            } else if (command === "start") {
+                await DockerService.startContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+                return {
+                    ok: "ok",
+                    data: "Database start successfully.",
+                };
+            } else {
+                return {
+                    ok: "error",
+                    message: "Command not found.",
+                };
+            }
+        } catch (error) {
+            const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
+            console.error('Erreur lors de la récupération des données:', errorMessage);
+            return {
+                ok: "error",
+                message: errorMessage
             };
         }
     }

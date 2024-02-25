@@ -5,13 +5,19 @@
             <div>Id</div>
             <div>Name</div>
             <div>Status</div>
+            <div>Storage</div>
             <div>Type</div>
         </div>
         <!-- Lignes de données filtrées -->
-        <div class="row rows" v-for="(bdd, index) in filteredBddData" :key="index">
+        <div class="row rows" v-for="(bdd, index) in filteredBddData" :key="index" @click="goToBddPage(bdd.id)">
             <div>{{ bdd.id ? bdd.id : 'no id' }}</div>
             <div>{{ bdd.Name ? bdd.Name : 'no name' }}</div>
-            <div>ok</div>
+            <!-- <div>{{ bdd.bddRun ? 'available' :  'unavailable' }}</div> -->
+            <span style="color: rgb(48, 198, 180)" v-if="bdd?.bddRun"><span style="color: rgb(48, 198, 180);font-size: larger">•</span>
+                    available</span>
+                <span v-else style="color: rgb(251, 71, 116)"><span
+                        style="color: rgb(251, 71, 116);font-size: larger">•</span> unavailable</span>
+            <div>{{ bdd.StorageRemaining ? bdd.StorageRemaining : 'no type' }}</div>
             <div>{{ bdd.Type ? bdd.Type : 'no type' }}</div>
         </div>
     </div>
@@ -19,6 +25,7 @@
   
 <script>
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'AllBdd',
@@ -27,6 +34,7 @@ export default {
         search: String
     },
     setup(props) {
+        const router = useRouter();
         // Computed property pour filtrer bddData basé sur la recherche
         const filteredBddData = computed(() => {
             const trimmedSearch = props.search.trim();
@@ -44,8 +52,13 @@ export default {
             });
         });
 
+        const goToBddPage = (id) => {
+            // Utilisez Vue Router pour naviguer
+            router.push({ name: 'IdBddPage', params: { idBdd: id } });
+        };
         return {
-            filteredBddData // Exposer la propriété filtrée pour l'utiliser dans le template
+            filteredBddData,
+            goToBddPage
         };
     }
 };
@@ -71,7 +84,8 @@ export default {
     align-items: center;
     width: 100%;
     height: 60px;
-    border-bottom: 0.5px solid #e5e7eb
+    border-bottom: 0.5px solid #e5e7eb;
+    font-size: medium
 }
 
 .rows:hover {

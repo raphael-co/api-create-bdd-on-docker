@@ -5,11 +5,12 @@
             <div>Id</div>
             <div>Name</div>
             <div>Status</div>
+            <div>Storage</div>
             <div>Type</div>
         </div>
-        <PlaceholderRowGetAllBdd :cellCount="4" />
-        <PlaceholderRowGetAllBdd :cellCount="4" />
-        <PlaceholderRowGetAllBdd :cellCount="4" />
+        <PlaceholderRowGetAllBdd :cellCount="5" />
+        <PlaceholderRowGetAllBdd :cellCount="5" />
+        <PlaceholderRowGetAllBdd :cellCount="5" />
     </div>
 </template>
   
@@ -42,7 +43,8 @@ export default {
     align-items: center;
     width: 100%;
     height: 60px;
-    border-bottom: 0.5px solid #e5e7eb
+    border-bottom: 0.5px solid #e5e7eb;
+    font-size: medium
 }
 
 .cell {

@@ -29,6 +29,41 @@ bdd.post('/create', JsonWebToken.ValidToken, validateBddInput, async (req: Reque
     }
 });
 
+bdd.post('/restart', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
+    try {
+
+        const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
+        const user = await BDDServices.RestartBDD(req.body, decoded.decoded.id);
+        res.status(201).send({ user });
+    } catch (error: unknown) {
+        // Check if the error is an instance of Error
+        if (error instanceof Error) {
+            res.status(500).send({ message: error.message });
+        } else {
+            // If the error is not an Error object, handle it as a generic error
+            res.status(500).send({ message: 'An unknown error occurred' });
+        }
+    }
+});
+
+bdd.post('/break', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
+    try {
+
+        const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
+        const user = await BDDServices.BreakBDD(req.body, decoded.decoded.id);
+        res.status(201).send({ user });
+    } catch (error: unknown) {
+        // Check if the error is an instance of Error
+        if (error instanceof Error) {
+            res.status(500).send({ message: error.message });
+        } else {
+            // If the error is not an Error object, handle it as a generic error
+            res.status(500).send({ message: 'An unknown error occurred' });
+        }
+    }
+});
+
+
 bdd.get('/:id', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
     try {
 

@@ -34,9 +34,7 @@ export default {
     /* Ajustez selon vos besoins */
 }
 
-.logo {
-    /* Styles pour le logo */
-}
+
 
 .logout-btn {
     padding: 10px 20px;

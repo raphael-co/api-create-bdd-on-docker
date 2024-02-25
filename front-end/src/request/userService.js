@@ -1,16 +1,16 @@
 // userService.js
 import axios from 'axios';
 
-const showLoader = () => {
+export function showLoader() {
     // Ajoute la classe 'show' à l'élément du loader
     document.getElementById('loader').classList.add('show');
-};
+}
 
-const hideLoader = () => {
+export function hideLoader() {
     // Retire la classe 'show', ce qui cache le loader
     document.getElementById('loader').classList.remove('show');
-};
-export default function showToast(message, type, duration = 3000) {
+}
+export function showToast(message, type, duration = 3000) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.classList.add('toast', type);
@@ -35,7 +35,7 @@ export default function showToast(message, type, duration = 3000) {
     }, duration);
 }
 export const userService = {
-    
+
     isAuthenticated() {
         return !!sessionStorage.getItem('authToken');
     },

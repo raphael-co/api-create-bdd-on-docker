@@ -142,7 +142,7 @@ export class UserServices {
                 token: token
             };
         } catch (error) {
-            console.error('Error:', (error as Error).message);
+            console.error('Error jwt :', (error as Error).message);
             return {
                 success: false,
                 message: (error as Error).message

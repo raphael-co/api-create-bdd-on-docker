@@ -27,9 +27,9 @@ export default {
     border-bottom: 0.5px solid #e5e7eb
 }
 
-.row:hover {
+/* .row:hover {
     background-color: #e5e7eb;
-}
+} */
 
 .cell {
     height: 20px;
