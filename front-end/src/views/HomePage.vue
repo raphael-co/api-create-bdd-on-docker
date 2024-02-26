@@ -11,6 +11,8 @@
       </div>
       <div class="search">
         <inputSearchBdd v-model="search" placeholder='Rechercher une bdd' />
+        <button class="add-db-button"><i class="fas fa-database"></i>
+          Create Database</button>
       </div>
       <div v-if="data === 'load'" class="load">
         <PlaceholderGetAllBdd />
@@ -78,6 +80,10 @@ export default {
 
 <style scoped>
 /* Styles spécifiques à Home */
+/* 
+.btnAdd {
+  width: 170px;
+} */
 
 .home-page {
   display: flex;
@@ -88,11 +94,12 @@ export default {
   gap: 20px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .home-page {
     padding: 0 100px;
   }
-  h2{
+
+  h2 {
     font-size: large;
   }
 }
@@ -103,9 +110,18 @@ export default {
   }
 }
 
+@media (max-width: 800px) {
+  .search{
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+}
+
 .search {
   width: 100%;
   display: flex;
+  justify-content: space-between;
 }
 
 .bdd-container {
@@ -113,5 +129,20 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 30px;
+}
+
+.add-db-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-db-button:hover {
+  background-color: #0056b3;
 }
 </style>

@@ -68,7 +68,7 @@ export default {
         const data = ref('load'); // Utilisation de ref pour la réactivité
         const bddData = ref(null);
         const error = ref(null);
-        const bddDataLoadGeneral = ["Name", "Created", "Status", "Type", "Storage"]
+        const bddDataLoadGeneral = ["Name", "Created", "Status", "Type", "Version", "Storage"]
         const bddDataLoadConnection = ["Hostname", "Port", "Database", "Type", "Username", "Password"]
         const fetchBddData = () => {
             bddService.getBddDataid(router)
@@ -111,7 +111,7 @@ export default {
     gap: 50px;
 }
 
-.menuChoice{
+.menuChoice {
     cursor: pointer;
     height: 30px;
     width: 100%;
@@ -121,9 +121,11 @@ export default {
     padding: 5px 10px 5px 5px;
     border-radius: 5px;
 }
-.menuChoice:hover{
+
+.menuChoice:hover {
     background-color: #f1f6ff;
 }
+
 @media screen and (max-width: 800px) {
     .IdBddPage-page {
         padding: 0 20px 20px;

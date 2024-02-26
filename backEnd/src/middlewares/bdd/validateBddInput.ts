@@ -1,14 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import { enumTypeBdd } from '../../models/enumTypeBdd';
 import JsonwebtokenController from '../user/JsonwebtokenController';
+
+const validDbVersions = {
+    postgres: ['16', '15', '14', "13", "12"],
+    mariadb: ['10.5', '10.6', '10.7', '10.4', '10.10', '10.11', '10.8', '10.9'],
+};
+
 const validateBddInput = (req: Request, res: Response, next: NextFunction) => {
-    const { name, type, databaseName } = req.body;
-    
+    const { name, type, databaseName, versionBdd } = req.body; // Ajouté : dbVersion
+
     const dbNameRegex = /^[a-zA-Z0-9_]+$/;
 
-    // Simple validation logic
-    if (!name || !type || !databaseName) {
-        return res.status(400).send({ message: "All fields are required" });
+    // Validation de base
+    if (!name || !type || !databaseName || !versionBdd) {
+        return res.status(400).send({ message: "All fields including dbVersion are required" });
     }
 
     if (!Object.values(enumTypeBdd).includes(type as enumTypeBdd)) {
@@ -18,21 +24,24 @@ const validateBddInput = (req: Request, res: Response, next: NextFunction) => {
     if (databaseName.length < 6) {
         return res.status(400).send({ message: "databaseName must be at least 6 characters long" });
     }
+
     if (!dbNameRegex.test(databaseName)) {
         return res.status(400).send({ message: "le nom de la base de donnée doit contenir uniquement des caractères alphanumériques et des _" });
-    } 
+    }
 
-    // Check if the email is valid
-    // if (!/^[^@]+@\w+(\.\w+)+\w$/.test(email)) {
-    //     return res.status(400).send({ message: "Invalid email format" });
-    // }
-
-    // Check if the password is strong
     if (name.length < 6) {
         return res.status(400).send({ message: "name must be at least 6 characters long" });
     }
 
-    // If the input passes validation, proceed to the next middleware
+    // Ajouté : Vérification de la version de la BDD
+    const validVersions = validDbVersions[type as keyof typeof validDbVersions];
+
+    if (!validVersions || !validVersions.includes(versionBdd)) {
+        return res.status(400).send({ message: `La version ${versionBdd} n'est pas valide pour le type ${type}` });
+    }
+
+    // Si l'entrée passe la validation, procéder au middleware suivant
     next();
 };
-export default validateBddInput;  
+
+export default validateBddInput;
