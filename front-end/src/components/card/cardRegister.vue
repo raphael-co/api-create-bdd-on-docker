@@ -37,7 +37,7 @@ export default {
     .cardRegister-container {
         max-width: 320px;
         height: 100%;
-        max-height: 490px;
+        max-height: 1000px;
 ;
         /* min-height: 100vh; */
         /* Change la direction de row à column pour les petits écrans */
@@ -47,7 +47,7 @@ export default {
 @media (max-width: 380px) {
     .cardRegister-container {
         max-width: 300px;
-        max-height: 490px;
+        max-height: 1000px;
         /* min-height: 100vh; */
         /* Change la direction de row à column pour les petits écrans */
     }

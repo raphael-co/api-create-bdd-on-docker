@@ -20,6 +20,7 @@ export default {
 body {
   margin: 0;
   padding: 0;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 .loader-container {

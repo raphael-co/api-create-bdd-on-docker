@@ -11,7 +11,7 @@
       </div>
       <div class="search">
         <inputSearchBdd v-model="search" placeholder='Rechercher une bdd' />
-        <button class="add-db-button"><i class="fas fa-database"></i>
+        <button @click="goToCreateBdd()" class="add-db-button"><i class="fas fa-database"></i>
           Create Database</button>
       </div>
       <div v-if="data === 'load'" class="load">
@@ -42,6 +42,11 @@ export default {
     inputSearchBdd,
     HeaderComp,
     AllBdd
+  },
+  methods: {
+    goToCreateBdd() {
+      this.$router.push('/create');
+    }
   },
   setup() {
     const search = ref(""); // Modifier ici pour utiliser ref
