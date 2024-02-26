@@ -9,7 +9,7 @@
             <hr />
             <div class="infoGeneral" v-for="data in bddData" :key="data">
                 <span class="infoTitleGe">
-                    {{ data }} :
+                    {{ data }}
                 </span>
                 <span style="width: 100%">
                     <PlaceholderRowGetAllBdd :cellCount="1" />

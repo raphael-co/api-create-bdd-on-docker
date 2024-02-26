@@ -4,6 +4,7 @@ import LoginPage from '../views/LoginPage.vue';
 import RegisterPage from '../views/RegisterPage.vue';
 import { userService } from '@/request/userService';
 import IdBddPage from '../views/IdBddPage.vue';
+import CreateBddPage from '../views/CreateBddPage.vue';
 const routes = [
     {
         path: '/',
@@ -36,6 +37,14 @@ const routes = [
         component: RegisterPage,
         meta: {
             requiresAuth: false,
+            // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
+        }
+    },{
+        path: '/create',
+        name: 'CreateBddPage',
+        component: CreateBddPage,
+        meta: {
+            requiresAuth: true,
             // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         }
     },

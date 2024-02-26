@@ -1,26 +1,65 @@
 // DockerService.ts
 import { exec } from 'child_process';
 import util from 'util';
+import * as net from 'net';
 
 const execCallback = util.promisify(exec);
 
 interface Mount {
     Type: string;
     Name: string;
-    // Ajoutez d'autres champs au besoin, selon la structure de votre objet Mount
 }
+
+type DbType = 'postgres' | 'mariadb';
+
 export class DockerService {
-    static async createContainer(name: string, type: string, config: [string, string, string, string]): Promise<string> {
+
+    static async findAvailablePort(start: number, end: number): Promise<number> {
+        const portIsOpen = async (port: number) => {
+            return new Promise((resolve) => {
+                const server = net.createServer()
+                server.listen(port, () => {
+                    server.once('close', () => {
+                        resolve(true)
+                    })
+                    server.close()
+                })
+                server.on('error', () => {
+                    resolve(false)
+                })
+            })
+        }
+
+        for (let port = start; port <= end; port++) {
+            if (await portIsOpen(port)) {
+                return port
+            }
+        }
+        throw new Error('No available ports found')
+    }
+
+    private static portRange = {
+        postgres: [5501, 5600],
+        mariadb: [5601, 5700],
+    };
+
+    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string):  Promise<{ containerId: string; port: number }> {
         let dockerCommand = 'docker';
-        let dockerArgs = this.buildDockerArgs(name, type, config);
+
+        const portStart = this.portRange[type][0];
+        const portEnd = this.portRange[type][1];
+
+        const availablePort = await this.findAvailablePort(portStart, portEnd);
+
+        let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion, availablePort); // Passer availablePort ici
 
         return new Promise((resolve, reject) => {
-            const dockerProcess = exec(`${dockerCommand} ${dockerArgs.join(' ')}`, (error, stdout, stderr) => {
+            exec(`${dockerCommand} ${dockerArgs.join(' ')}`, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error creating Docker container: ${error}`);
                     return reject(error);
                 }
-                resolve(stdout.trim());
+                resolve({ containerId: stdout.trim(), port: availablePort });
             });
         });
     }
@@ -38,9 +77,7 @@ export class DockerService {
         });
     }
 
-    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string]): string[] {
-        // Implement logic to build docker command arguments based on the type and config
-        // This is a placeholder function. You should implement the actual logic.
+    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string], dbVersion: string, availablePort: number): string[] {
         let dockerArgs: string[];
         if (type === "postgres") {
             dockerArgs = [
@@ -48,52 +85,49 @@ export class DockerService {
                 '--env', 'POSTGRES_PASSWORD=' + config[0],
                 '--env', 'POSTGRES_USER=' + config[1],
                 '--env', 'POSTGRES_DB=' + config[2],
-                '-p', '5432:5432',
-                '-d', 'postgres'
+                '-p', `${availablePort}:5432`,
+                '-d', `postgres:${dbVersion}`
             ];
         } else if (type === "mariadb") {
             dockerArgs = [
                 'run', '--name', name,
-                '--env', 'MARIADB_PASSWORD=' +  config[0],
-                '--env', 'MARIADB_USER=' +  config[1],
-                '--env', 'MARIADB_DATABASE=' +  config[2],
-                '--env', 'MARIADB_ROOT_PASSWORD=' +  config[3],
-                '-p', '3306:3306',
-                '-d', 'mariadb'
+                '--env', 'MARIADB_PASSWORD=' + config[0],
+                '--env', 'MARIADB_USER=' + config[1],
+                '--env', 'MARIADB_DATABASE=' + config[2],
+                '--env', 'MARIADB_ROOT_PASSWORD=' + config[3],
+                '-p', `${availablePort}:3306`,
+                '-d', `mariadb:${dbVersion}`
             ];
-        }else{
+        } else {
             dockerArgs = [];
         }
         return dockerArgs;
     }
-    
+
     static async getContainerStorageUsed(containerId: string): Promise<string> {
         try {
-            console.log(`Calculating Docker container storage used for container ID: ${containerId}`); 
+            console.log(`Calculating Docker container storage used for container ID: ${containerId}`);
             const { stdout } = await execCallback(`docker inspect --format='{{json .Mounts}}' ${containerId}`);
             const mounts: Mount[] = JSON.parse(stdout.trim());
             const volumeSizesPromises = mounts.filter(mount => mount.Type === "volume").map(async (mount) => {
-                // Exécuter un conteneur temporaire pour inspecter l'espace utilisé du volume
                 const inspectCommand = `docker run --rm -v ${mount.Name}:/data alpine du -sh /data | cut -f1`;
                 const { stdout: sizeOutput } = await execCallback(inspectCommand);
                 const sizeWithUnit = sizeOutput.trim();
-                // Conversion de la taille avec unité en un nombre en mégaoctets (ou toute autre unité de votre choix)
                 const sizeInBytes = this.convertSizeToBytes(sizeWithUnit);
+
                 return sizeInBytes;
             });
-    
+
             const volumeSizes = await Promise.all(volumeSizesPromises);
-            // Convertissez la somme totale en l'unité souhaitée, ici pour l'exemple en gigaoctets
             const totalSizeInBytes = volumeSizes.reduce((acc, size) => acc + size, 0);
             const totalSizeInGigabytes = totalSizeInBytes / (1024 * 1024 * 1024);
-            return totalSizeInGigabytes.toFixed(2) + ' GB'; // Retournez la taille totale comme une chaîne avec unité
+            return totalSizeInGigabytes.toFixed(2) + ' GB';
         } catch (error) {
             console.error(`Error calculating Docker container storage used: ${error}`);
             throw error;
         }
     }
-    
-    // Fonction pour convertir une chaîne de taille avec unité (ex. "46M", "1.2G") en octets
+
     static convertSizeToBytes(sizeWithUnit: string): number {
         const units: { [key: string]: number } = {
             K: 1024,
@@ -107,7 +141,7 @@ export class DockerService {
             const unit = match[2];
             return value * (units[unit] || 1);
         }
-        return 0; // Gérer les cas où le format n'est pas reconnu
+        return 0;
     }
 
     static async restartContainer(containerId: string): Promise<void> {

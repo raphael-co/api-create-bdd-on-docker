@@ -19,11 +19,9 @@ user.post('/register', validateUserInput, async (req: Request, res: Response) =>
             res.status(400).send({ user }); 
         }
     } catch (error: unknown) {
-        // Check if the error is an instance of Error
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
         } else {
-            // If the error is not an Error object, handle it as a generic error
             res.status(500).send({ message: 'An unknown error occurred' });
         }
     }
@@ -41,11 +39,9 @@ user.post('/login', validateUserInputLogin, async (req: Request, res: Response) 
         }
         
     } catch (error: unknown) {
-        // Check if the error is an instance of Error
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
         } else {
-            // If the error is not an Error object, handle it as a generic error
             res.status(500).send({ message: 'An unknown error occurred' });
         }
     }
@@ -60,11 +56,9 @@ user.delete('/', JsonWebToken.ValidToken, async (req: Request, res: Response) =>
 
         res.status(201).send({ user });
     } catch (error: unknown) {
-        // Check if the error is an instance of Error
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
         } else {
-            // If the error is not an Error object, handle it as a generic error
             res.status(500).send({ message: 'An unknown error occurred' });
         }
     }

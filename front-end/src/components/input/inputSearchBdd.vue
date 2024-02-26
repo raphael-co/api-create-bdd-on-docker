@@ -30,8 +30,8 @@ export default {
   
 <style scoped>
 .inputSearch {
-    width: 100%;
-    max-width: 400px;
+    /* width: 100%; */
+    min-width: 300px;
     padding: 0.5rem;
     border-radius: 5px;
     border: 1px solid #ccc;

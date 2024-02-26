@@ -13,6 +13,4 @@ export class DatabaseService {
         const conn = await databaseSecretKeyConnectionPromise;
         return conn.query(query, params);
     }
-
-    // Add more database operations as needed
 }

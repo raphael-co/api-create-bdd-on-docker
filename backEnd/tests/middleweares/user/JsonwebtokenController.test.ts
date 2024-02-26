@@ -5,9 +5,8 @@ describe('JsonwebtokenController', () => {
   let token: string;
 
   beforeAll(() => {
-    // Configurez les variables d'environnement si nécessaire
-    process.env.JWT_SECRET_KEY = 'your_secret_key_for_testing'; // Assurez-vous d'utiliser une clé de test
-    userId = 123; // Exemple d'ID utilisateur
+    process.env.JWT_SECRET_KEY = 'your_secret_key_for_testing';
+    userId = 70; 
   });
 
   test('generateJwtToken should generate a valid JWT token', () => {

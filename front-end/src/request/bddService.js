@@ -141,6 +141,33 @@ export const bddService = {
                 }
                 throw error;
             });
-    }
+    },
+    async createDatabase(credentials, router) {
+        showLoader();
+        const config = {
+            headers: {
+                Authorization: userService.getToken()
+            }
+        };
+
+        return axios.post(`http://localhost:3000/bdd/create`, credentials, config)
+            .then(response => {
+                hideLoader();
+                showToast(" La base de données a bien été créée","success", 5000);
+                router.push({ name: 'IdBddPage', params: { idBdd: response.data.user.id } });
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+                if (error.response && error.response.status === 401) {
+                    hideLoader();
+                    showToast("Veuillez vous connecter à nouveau", "error", 5000);
+                    userService.logoutForce(router);
+                } else {
+                    hideLoader();
+                    showToast("Une erreur est survenue", "error", 5000);
+                }
+                throw error;
+            });
+    },
 
 };

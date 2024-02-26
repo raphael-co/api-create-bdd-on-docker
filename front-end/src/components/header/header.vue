@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="logo">LOGO</div>
+        <div  @click="goHomme" class="logo"><img src="../../assets/logoDocker.png" alt="logo" /></div>
         <button @click="logoutBtn" class="logout-btn">Déconnecter</button>
     </div>
 </template>
@@ -14,11 +14,15 @@ export default {
     setup() {
         const router = useRouter();
 
+        function goHomme() {
+            router.push({ name: 'HomePage' });
+        }
         function logoutBtn() {
             userService.logout(router)
         }
         return {
             logoutBtn,
+            goHomme
         };
     },
 };
@@ -30,12 +34,18 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
+    padding: 10px 0 0 0;
     /* Ajustez selon vos besoins */
 }
 
 
-
+.logo{
+    width: 150px;
+    cursor: pointer;
+}
+.logo img{
+    width: 100%;
+}
 .logout-btn {
     padding: 10px 20px;
     /* Ajustez selon vos besoins */

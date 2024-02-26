@@ -1,4 +1,4 @@
-import genereatePassword from '../../../src/middlewares/bdd/genereatePassword'; // Mettez à jour avec le chemin correct
+import genereatePassword from '../../../src/middlewares/bdd/genereatePassword'; 
 
 describe('genereatePassword', () => {
   it('should generate a password of default length', () => {
@@ -28,6 +28,5 @@ describe('genereatePassword', () => {
     expect(passwords.size).toBe(attempts);
   });
   
-  // Vous pouvez ajouter des tests supplémentaires pour couvrir d'autres cas d'utilisation
 });
 

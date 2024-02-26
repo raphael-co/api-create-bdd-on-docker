@@ -27,6 +27,10 @@
                 <span>{{ bddData?.type ? bddData.type : 'no name' }}</span>
             </div>
             <div class="infoGeneral">
+                <span class="infoTitleGe">Version</span>
+                <span>{{ bddData?.VersionBdd ? bddData.VersionBdd : 'no name' }}</span>
+            </div>
+            <div class="infoGeneral">
                 <span class="infoTitleGe">Storage</span>
                 <span>{{ bddData?.StorageRemaining ? bddData.StorageRemaining : 'no name' }}</span>
             </div>

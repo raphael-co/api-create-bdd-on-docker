@@ -27,7 +27,6 @@ class BDDServices {
         };
 
         try {
-            // Retrieve the secret key using DatabaseService
             const [rows] = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [id]
             );
@@ -52,7 +51,6 @@ class BDDServices {
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
 
         try {
-            // Retrieve the BDD info using DatabaseService
             const [rows] = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
@@ -64,10 +62,7 @@ class BDDServices {
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
             const containerId = Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer);
 
-            // Delete the Docker container using DockerService
             await DockerService.removeContainer(containerId);
-
-            // Delete entries from databases
 
             await DatabaseService.queryDatabase(
                 `DELETE FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
@@ -138,6 +133,7 @@ class BDDServices {
                 ContainerId: Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer),
                 Port: JSON.parse(rows[0].Port),
                 Host: Cryptage.decrypt(JSON.parse(rows[0].Host), keyBuffer),
+                VersionBdd: Cryptage.decrypt(JSON.parse(rows[0].VersionBdd), keyBuffer),
                 StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
                 bddRun: bddRun,
                 createAt: rows[0].Create_at
@@ -159,13 +155,11 @@ class BDDServices {
 
     static async getAllBdd(userid: number) {
         try {
-            // Récupérer toutes les entrées de bddInfo pour le userid donné
             const [rows] = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE UserId = ?`, [userid]
             );
 
             if (rows.length === 0) {
-                // Aucune base de données trouvée pour cet utilisateur
                 return {
                     ok: "ok",
                     message: "No databases found for the given user.",
@@ -173,9 +167,7 @@ class BDDServices {
                 };
             }
 
-            // Décrypter les informations de chaque base de données
-            const bdds = await Promise.all(rows.map(async (row: { id: any; Name: string; Type: string; DatabaseName: string; Username: string; Password: string; ContainerId: string; Port: string; Host: string; }) => {
-                // Récupérer et décrypter la clé secrète pour cette entrée de base de données
+            const bdds = await Promise.all(rows.map(async (row: { id: any; Name: string; Type: string; DatabaseName: string; Username: string; Password: string; ContainerId: string; Port: string; Host: string; VersionBdd: string }) => {
                 const [secretRows] = await DatabaseService.querySecretDatabase(
                     `SELECT * FROM secretKey WHERE idBdd = ?`, [row.id]
                 );
@@ -190,7 +182,6 @@ class BDDServices {
                 const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
                 const decryptedSecretKey = Cryptage.decrypt(secretKeyData, secretKeyBuffer);
 
-                // Utiliser la clé secrète décryptée pour décrypter les informations de la base de données
                 const keyBuffer = Buffer.from(JSON.parse(decryptedSecretKey).data);
                 const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
                 const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
@@ -204,8 +195,9 @@ class BDDServices {
                     ContainerId: Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer),
                     Port: JSON.parse(row.Port),
                     Host: Cryptage.decrypt(JSON.parse(row.Host), keyBuffer),
+                    VersionBdd: Cryptage.decrypt(JSON.parse(row.VersionBdd), keyBuffer),
                     createAt: rows[0].Create_at,
-                    StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
+                    StorageRemaining: storageRemaining,
                     bddRun: bddRun
                 };
             }));
@@ -225,7 +217,7 @@ class BDDServices {
 
 
     static createBDD = async (BddData: any, userid: number) => {
-        const { name, type, databaseName } = BddData;
+        const { name, type, databaseName, versionBdd } = BddData;
         const genereatePasswordString = genereatePassword();
         const generateUsernameString = genereateusername(name, type, databaseName);
         try {
@@ -237,21 +229,21 @@ class BDDServices {
                     token: null,
                 }
             }
-            // Assuming createContainer is correctly implemented and returns a promise
-            const result = DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString]);
+            const { containerId, port } = await DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString], versionBdd);
 
-            const secretKey: Buffer = randomBytes(32); // Clé de 256 bits pour AES-256
-            const iv: Buffer = randomBytes(16); // Vecteur d'initialisation
+            const secretKey: Buffer = randomBytes(32); 
+            const iv: Buffer = randomBytes(16);
 
             const dbInfo = {
                 Name: name,
+                versionBdd: versionBdd,
                 Type: type,
                 Host: 'localhost',
-                Port: type === "postgres" ? 5432 : 3306,
+                Port: port,
                 Database: databaseName,
                 Username: generateUsernameString,
                 Password: genereatePasswordString,
-                ContainerId: await result,
+                ContainerId: containerId,
                 userid: userid
             };
 
@@ -264,12 +256,12 @@ class BDDServices {
                 JSON.stringify(Cryptage.encrypt(dbInfo.Host, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Type, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.ContainerId, secretKey, iv)),
-                JSON.stringify(Cryptage.encrypt(dbInfo.Name, secretKey, iv))
+                JSON.stringify(Cryptage.encrypt(dbInfo.Name, secretKey, iv)),
+                JSON.stringify(Cryptage.encrypt(dbInfo.versionBdd, secretKey, iv)),
             ];
 
-            const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)`;
+            const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name,VersionBdd) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
-            // Using DatabaseService for the main database operation
             const [insertResults] = await DatabaseService.queryDatabase(query, values);
             let id = insertResults.insertId;
 
@@ -279,7 +271,6 @@ class BDDServices {
             const querySecret = `INSERT INTO secretKey (idBdd, secretKey) VALUES (?, ?)`;
             const valuesSecret = [id, encryptedSecretKey];
 
-            // Using DatabaseService for the secret database operation
             await DatabaseService.querySecretDatabase(querySecret, valuesSecret);
 
             return {
