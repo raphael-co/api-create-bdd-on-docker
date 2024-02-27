@@ -20,7 +20,7 @@ export default {
         },
         type: {
             type: String,
-            default: 'text' // Vous pouvez changer ce type par défaut selon les besoins
+            default: 'text'
         },
         placeholder: {
             type: String,
@@ -28,16 +28,18 @@ export default {
         },
         inputClass: {
             type: String,
-            default: '' // Permet de passer des classes CSS personnalisées
+            default: ''
         }
     },
-    emits: ['update:modelValue'] // Pour supporter v-model
+    emits: ['update:modelValue'] 
 };
 </script>
   
 <style scoped>
   .input-container {
     margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
   }
 
 input[type=text],
@@ -49,6 +51,5 @@ input[type=password] {
     border-radius: 5px;
 }
 
-/* Styles spécifiques à Input */
 </style>
   

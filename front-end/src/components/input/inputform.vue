@@ -22,12 +22,12 @@ export default {
     },
     data() {
         return {
-            inputValue: '' // Data property to hold the input value
+            inputValue: ''
         };
     },
     methods: {
         emitInputValue() {
-            this.$emit('updateValue', this.inputValue); // Emit the input value to the parent component
+            this.$emit('updateValue', this.inputValue);
         }
     }
 }
