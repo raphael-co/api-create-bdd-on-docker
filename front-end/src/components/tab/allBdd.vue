@@ -2,23 +2,23 @@
     <div class="table-placeholder">
         <!-- Entêtes de colonne -->
         <div class="row">
-            <div>Id</div>
-            <div>Name</div>
-            <div>Status</div>
-            <div>Storage</div>
-            <div>Type</div>
+            <div class="celluleRow">Id</div>
+            <div class="celluleRow">Name</div>
+            <div class="celluleRow">Status</div>
+            <div class="celluleRow">Storage</div>
+            <div class="celluleRow">Type</div>
         </div>
-        <!-- Lignes de données filtrées -->
         <div class="row rows" v-for="(bdd, index) in filteredBddData" :key="index" @click="goToBddPage(bdd.id)">
-            <div>{{ bdd.id ? bdd.id : 'no id' }}</div>
-            <div>{{ bdd.Name ? bdd.Name : 'no name' }}</div>
-            <!-- <div>{{ bdd.bddRun ? 'available' :  'unavailable' }}</div> -->
-            <span style="color: rgb(48, 198, 180)" v-if="bdd?.bddRun"><span style="color: rgb(48, 198, 180);font-size: larger">•</span>
-                    available</span>
-                <span v-else style="color: rgb(251, 71, 116)"><span
-                        style="color: rgb(251, 71, 116);font-size: larger">•</span> unavailable</span>
-            <div>{{ bdd.StorageRemaining ? bdd.StorageRemaining : 'no type' }}</div>
-            <div>{{ bdd.Type ? bdd.Type : 'no type' }}</div>
+            <div class="celluleRow">{{ bdd.id ? bdd.id : 'no id' }}</div>
+            <div class="celluleRow">{{ bdd.Name ? bdd.Name : 'no name' }}</div>
+            <span class="status" style="color: rgb(48, 198, 180)" v-if="bdd?.bddRun"><span
+                    style="color: rgb(48, 198, 180);font-size: larger">•</span>
+                available</span>
+            <span v-else class="status" style="color: rgb(251, 71, 116)"><span
+                    style="color: rgb(251, 71, 116);font-size: larger">•</span>
+                unavailable</span>
+            <div class="celluleRow">{{ bdd.StorageRemaining ? bdd.StorageRemaining : 'no type' }}</div>
+            <div class="celluleRow">{{ bdd.Type ? bdd.Type : 'no type' }}</div>
         </div>
     </div>
 </template>
@@ -70,6 +70,22 @@ export default {
     border-radius: 4px;
     width: 100%;
     /* Ajustez à la largeur désirée */
+}
+
+.celluleRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    width: 100%;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    width: 100%;
 }
 
 .header {
