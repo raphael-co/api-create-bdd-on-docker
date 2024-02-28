@@ -43,23 +43,29 @@ export class DockerService {
         mariadb: [5601, 5700],
     };
 
-    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string):  Promise<{ containerId: string; port: number }> {
+    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<{ containerId: string; port: number }> {
         let dockerCommand = 'docker';
 
         const portStart = this.portRange[type][0];
         const portEnd = this.portRange[type][1];
 
-        const availablePort = await this.findAvailablePort(portStart, portEnd);
+        //Laisse docker gerer les ports a utiliser a revenir plus tard pour voir comment gerer ce probleme de port
 
-        let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion, availablePort); // Passer availablePort ici
+        // const availablePort = await this.findAvailablePort(portStart, portEnd);
+        // console.log(`Available port: ${availablePort}`);
+        
+
+        let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion);
 
         return new Promise((resolve, reject) => {
-            exec(`${dockerCommand} ${dockerArgs.join(' ')}`, (error, stdout, stderr) => {
+            exec(`${dockerCommand} ${dockerArgs.join(' ')}`, async (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error creating Docker container: ${error}`);
                     return reject(error);
                 }
-                resolve({ containerId: stdout.trim(), port: availablePort });
+                const getAllocatedPort = await this.getAllocatedPort(stdout.trim(), type);
+
+                resolve({ containerId: stdout.trim(), port: getAllocatedPort });
             });
         });
     }
@@ -71,13 +77,21 @@ export class DockerService {
                     console.error(`Error removing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container removed: ${containerId}`);
                 resolve();
             });
         });
     }
 
-    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string], dbVersion: string, availablePort: number): string[] {
+    private static async getAllocatedPort(containerId: string, type: DbType): Promise<number> {
+        const portMappingCommand = `docker port ${containerId}`;
+        const { stdout } = await execCallback(portMappingCommand);
+        const portMappingOutput = stdout.trim();
+
+        const regex = type === 'postgres' ? /5432\/tcp -> .+:(\d+)/ : /3306\/tcp -> .+:(\d+)/;
+        const match = portMappingOutput.match(regex);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string], dbVersion: string): string[] {
         let dockerArgs: string[];
         if (type === "postgres") {
             dockerArgs = [
@@ -85,7 +99,7 @@ export class DockerService {
                 '--env', 'POSTGRES_PASSWORD=' + config[0],
                 '--env', 'POSTGRES_USER=' + config[1],
                 '--env', 'POSTGRES_DB=' + config[2],
-                '-p', `${availablePort}:5432`,
+                '-p', `0:5432`,
                 '-d', `postgres:${dbVersion}`
             ];
         } else if (type === "mariadb") {
@@ -95,7 +109,7 @@ export class DockerService {
                 '--env', 'MARIADB_USER=' + config[1],
                 '--env', 'MARIADB_DATABASE=' + config[2],
                 '--env', 'MARIADB_ROOT_PASSWORD=' + config[3],
-                '-p', `${availablePort}:3306`,
+                '-p', `0:3306`,
                 '-d', `mariadb:${dbVersion}`
             ];
         } else {
@@ -106,7 +120,6 @@ export class DockerService {
 
     static async getContainerStorageUsed(containerId: string): Promise<string> {
         try {
-            console.log(`Calculating Docker container storage used for container ID: ${containerId}`);
             const { stdout } = await execCallback(`docker inspect --format='{{json .Mounts}}' ${containerId}`);
             const mounts: Mount[] = JSON.parse(stdout.trim());
             const volumeSizesPromises = mounts.filter(mount => mount.Type === "volume").map(async (mount) => {
@@ -151,7 +164,6 @@ export class DockerService {
                     console.error(`Error restarting Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container restarted: ${containerId}`);
                 resolve();
             });
         });
@@ -164,7 +176,6 @@ export class DockerService {
                     console.error(`Error pausing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container paused: ${containerId}`);
                 resolve();
             });
         });
@@ -177,7 +188,6 @@ export class DockerService {
                     console.error(`Error unpausing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container unpaused: ${containerId}`);
                 resolve();
             });
         });
