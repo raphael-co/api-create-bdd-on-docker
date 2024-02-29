@@ -53,7 +53,7 @@ export class DockerService {
 
         // const availablePort = await this.findAvailablePort(portStart, portEnd);
         // console.log(`Available port: ${availablePort}`);
-        
+
 
         let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion);
 
@@ -199,6 +199,19 @@ export class DockerService {
             return stdout.trim() === 'true';
         } catch (error) {
             console.error(`Error checking if Docker container is running: ${error}`);
+            throw error;
+        }
+    }
+    static async getContainerPorts(containerId: string): Promise<string> {
+        try {
+            const { stdout } = await execCallback(`docker port ${containerId}`);
+            const portMatch = stdout.match(/-> 0\.0\.0\.0:(\d+)/);
+            if (portMatch && portMatch[1]) {
+                return portMatch[1].trim(); 
+            }
+            throw new Error('No port found');
+        } catch (error) {
+            console.error(`Error fetching Docker container ports: ${error}`);
             throw error;
         }
     }

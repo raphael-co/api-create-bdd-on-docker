@@ -49,31 +49,47 @@ export default {
     },
     methods: {
         stopDatabase() {
-            // Émettre un événement au parent avec la nouvelle valeur souhaitée
             bddService.breakdatabase('stop', this.bddData.id, this.router)
             this.$emit('handleUpdateBddRun', false);
         },
         startDatabase() {
-            // Émettre un événement au parent avec la nouvelle valeur souhaitée
             bddService.breakdatabase('start', this.bddData.id, this.router)
-            this.$emit('handleUpdateBddRun', true);
+                .then(port => {
+                    this.$emit('handleUpdateBddRun', true);
+                    if (port) {
+                        this.$emit('handleUpdateBddPort', port); // Émet seulement si le port est retourné
+                    }
+                })
+                .catch(error => {
+                    // Gérer l'erreur si nécessaire
+                    console.log(error);
+                });
         },
+
+        // handleUpdateBddPort
 
         restartdatabase() {
             bddService.restartdatabase(this.bddData.id, this.router)
-            this.$emit('handleUpdateBddRun', true);
+                .then(port => {
+                    this.$emit('handleUpdateBddRun', true);
+                    if (port) {
+                        this.$emit('handleUpdateBddPort', port); // Émet seulement si le port est retourné
+                    }
+                })
+                .catch(error => {
+                    // Gérer l'erreur si nécessaire
+                    console.log(error);
+                });
         },
 
         toggleDeleteModal() {
             this.showDeleteModal = !this.showDeleteModal;
         },
 
-        // Modify this method to show the modal instead of directly calling the delete service
         deletedatabase() {
             this.toggleDeleteModal();
         },
 
-        // This method will be called when the confirmation is made in the modal
         confirmDeleteDatabase() {
             bddService.deletedatabase(this.bddData.id, this.deleteConfirmation, this.router);
         }
@@ -226,6 +242,7 @@ export default {
     cursor: pointer;
     border-radius: 5px;
 }
+
 .inputDelete {
     width: 100%;
     padding: 0.5rem;

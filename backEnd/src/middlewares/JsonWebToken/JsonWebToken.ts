@@ -1,12 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import JsonwebtokenController from '../user/JsonwebtokenController';
 
-export interface EncryptedData {
-    encrypted: string;
-    iv: string;
-    tag: string;
-}
-
 class JsonWebToken {
 
     static ValidToken(req: Request, res: Response, next: NextFunction) {

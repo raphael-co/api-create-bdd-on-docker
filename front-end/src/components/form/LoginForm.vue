@@ -27,8 +27,7 @@ export default {
         return {
             credentials: {
                 mail: '',
-                password: '',
-                confirmPassword: ''
+                password: ''
             },
         };
     },

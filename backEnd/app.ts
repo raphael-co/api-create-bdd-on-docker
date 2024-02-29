@@ -15,30 +15,11 @@ console.log(env.PORT);
 
 console.log(`Ready on ${env.NODE_ENV} mode`)//express
 const app: Application = express();
-// const server = http.createServer(app)
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: '*'
-//   }
-// }) //in case server and client run on different urls
-// http://localhost:4000/img/1679588069188.jpg
-// app.use('/img', express.static('images'));
 
 app.use(cors());
 app.use(helmet());
-// app.use((req, res, next) => {
- 
-//   next();
-// });
+
 app.use(express.json());
-// app.use((req: any, res, next) => {
-//   req.io = io;
-//   return next();
-// })
-
-
-// server.listen(process.env.PORT || 4000);
 
 app.use('/', routes);
 
