@@ -11,7 +11,6 @@ class JsonWebToken {
 
     static ValidToken(req: Request, res: Response, next: NextFunction) {
         try {
-
             const authHeader = req.headers.authorization;
             if (authHeader == null) {
                 return res.status(401).send({ message: "Token is required" });

@@ -39,8 +39,7 @@ export default {
             userService.login(this.credentials)
                 .then(data => {
                     console.log('Login successful:', data);
-                    // Redirect or manage login state as needed
-                    this.$router.push({ name: 'HomePage' }); // Rediriger l'utilisateur vers la page d'accueil après la connexion
+                    this.$router.push({ name: 'HomePage' });
                 })
                 .catch(error => {
                     console.error('Login failed:', error);

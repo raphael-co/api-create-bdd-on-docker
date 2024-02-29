@@ -61,9 +61,9 @@ export class UserServices {
     };
 
     static register = async (userData: any) => {
-        const { id, mail, password } = userData;
+        let { id, mail, password } = userData;
         const hashedPassword = await HashPassword.hashPassword(password);
-
+        mail = mail.toLowerCase();
         try {
             const [rows] = await DatabaseService.queryDatabase(
                 "INSERT INTO `users` (`id`, `mail`, `password`) VALUES (?, ?, ?)", [id, mail, hashedPassword]
@@ -90,8 +90,8 @@ export class UserServices {
         }
     };
     static login = async (userData: any) => {
-        const { mail, password } = userData;
-
+        let { mail, password } = userData;
+        mail = mail.toLowerCase();
         try {
             const [users] = await DatabaseService.queryDatabase(
                 "SELECT * FROM `users` WHERE `mail` = ?", [mail]

@@ -4,6 +4,7 @@ import validateBddInput from '../middlewares/bdd/validateBddInput';
 import { Request, Response } from 'express';
 import JsonWebToken from '../middlewares/JsonWebToken/JsonWebToken';
 import JsonwebtokenController from '../middlewares/user/JsonwebtokenController';
+import validateDeleteBdd from '../middlewares/bdd/validateDeleteBdd';
 
 const bdd = Router();
 
@@ -91,7 +92,7 @@ bdd.get('/', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
     }
 });
 
-bdd.delete('/:id', async (req: Request, res: Response) => {
+bdd.post('/delete/:id', JsonWebToken.ValidToken, validateDeleteBdd, async (req: Request, res: Response) => {
     try {
         const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
         const result = await BDDServices.deleteBddwithId(Number(req.params.id), decoded.decoded.id);
