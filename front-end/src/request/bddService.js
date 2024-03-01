@@ -62,6 +62,10 @@ export const bddService = {
                 // Traitement de la réponse
                 hideLoader();
                 showToast(response.data.user.data, "success", 5000);
+
+                if (response.data.user.port) {
+                    return response.data.user.port
+                }
             })
             .catch(error => {
                 console.error('There was an error!', error);
@@ -96,6 +100,10 @@ export const bddService = {
                 // Traitement de la réponse
                 hideLoader();
                 showToast(response.data.user.data, "success", 5000);
+
+                if (response.data.user.port) {
+                    return response.data.user.port
+                }
             })
             .catch(error => {
                 console.error('There was an error!', error);
@@ -112,15 +120,17 @@ export const bddService = {
                 throw error;
             });
     },
-    async deletedatabase(bddId, router) {
+    async deletedatabase(bddId, deleteConfirmation, router) {
         showLoader();
         const config = {
             headers: {
                 Authorization: userService.getToken()
             }
         };
-
-        return axios.delete(`http://localhost:3000/bdd/${bddId}`, config)
+        const data = {
+            confirmDelete: deleteConfirmation
+        };
+        return axios.post(`http://localhost:3000/bdd/delete/${bddId}`, data, config)
             .then(response => {
                 // Traitement de la réponse
                 hideLoader();
@@ -134,12 +144,14 @@ export const bddService = {
                     hideLoader();
                     showToast("Veuillez vous connecter à nouveau", "error", 5000);
                     userService.logoutForce(router);
+                } else if (error.response && error.response.status === 400) {
+                    hideLoader();
+                    showToast(`Erreur: ${error.response.data.message}`, "error", 5000);
                 } else {
                     // Gestion des autres types d'erreurs
                     hideLoader();
                     showToast("Une erreur est survenue", "error", 5000);
                 }
-                throw error;
             });
     },
     async createDatabase(credentials, router) {
@@ -163,7 +175,8 @@ export const bddService = {
                     userService.logoutForce(router);
                 } else if (error.response && error.response.status === 400) {
                     hideLoader();
-                    showToast(error.response.data.message, "error", 5000);
+                    console.log(error);
+                    showToast(error.response.data.user.message, "error", 5000);
 
                 } else {
                     hideLoader();

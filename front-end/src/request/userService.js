@@ -57,6 +57,7 @@ export const userService = {
             const response = await axios.post('http://localhost:3000/user/login', credentials);
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);
+            // router.push({ name: 'HomePage' });
         } catch (error) {
             if (error.response && error.response.data) {
                 if (error.response.data.message) {
@@ -75,14 +76,14 @@ export const userService = {
         }
     },
 
-    async register(credentials) {
+    async register(credentials,router) {
         showLoader();
         try {
             const response = await axios.post('http://localhost:3000/user/register', credentials);
 
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);
-            this.$router.push({ name: 'HomePage' }); // Rediriger l'utilisateur vers la page d'accueil après la connexion
+            router.push({ name: 'HomePage' }); // Rediriger l'utilisateur vers la page d'accueil après la connexion
         } catch (error) {
             if (error.response.data.message) {
                 showToast(`Erreur: ${error.response.data.message}`, "error", 5000);

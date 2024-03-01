@@ -19,21 +19,7 @@ export default {
     RegisterForm,
     cardRegister,
     AnimatedBackground
-  },
-  data() {
-    return {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      Test: ''
-    };
-  },
-  methods: {
-    register() {
-      // Logique d'inscription
-      alert('Tentative d\'inscription');
-    },
-  },
+  }
 };
 </script>
   

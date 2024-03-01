@@ -21,23 +21,26 @@
 <script>
 import InputComponent from '../input/textInput.vue';
 import { userService } from '../../request/userService';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
     InputComponent
   },
   data() {
+    const router = useRouter();
     return {
       credentials: {
         mail: '',
         password: '',
         confirmPassword: ''
       },
+      router
     };
   },
   methods: {
     register() {
-      userService.register(this.credentials)
+      userService.register(this.credentials, this.router)
         .then(data => {
           console.log('Login successful:', data);
           // Redirect or manage login state as needed
@@ -79,6 +82,7 @@ export default {
     /* Change la direction de row à column pour les petits écrans */
   }
 }
+
 h2 {
   color: #333;
   text-align: center;

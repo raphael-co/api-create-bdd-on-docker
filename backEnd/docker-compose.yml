@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  app:
+    image: api-create-bdd-on-docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql_secret:
+        condition: service_healthy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bddStokage
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-bddStokage.sql:/docker-entrypoint-initdb.d/init-bddStokage.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  mysql_secret:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: secret-Key
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-secret-data:/var/lib/mysql
+      - ./init-secret-Key.sql:/docker-entrypoint-initdb.d/init-secret-Key.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+volumes:
+  mysql-data:
+  mysql-secret-data:

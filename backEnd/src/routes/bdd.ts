@@ -4,6 +4,7 @@ import validateBddInput from '../middlewares/bdd/validateBddInput';
 import { Request, Response } from 'express';
 import JsonWebToken from '../middlewares/JsonWebToken/JsonWebToken';
 import JsonwebtokenController from '../middlewares/user/JsonwebtokenController';
+import validateDeleteBdd from '../middlewares/bdd/validateDeleteBdd';
 
 const bdd = Router();
 
@@ -17,7 +18,13 @@ bdd.post('/create', JsonWebToken.ValidToken, validateBddInput, async (req: Reque
 
         const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
         const user = await BDDServices.createBDD(req.body, decoded.decoded.id);
-        res.status(201).send({ user });
+
+        if (user.success) {
+            res.status(201).send({ user });
+        } else {
+            res.status(400).send({ user }); 
+        }
+        
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
@@ -91,7 +98,7 @@ bdd.get('/', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
     }
 });
 
-bdd.delete('/:id', async (req: Request, res: Response) => {
+bdd.post('/delete/:id', JsonWebToken.ValidToken, validateDeleteBdd, async (req: Request, res: Response) => {
     try {
         const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
         const result = await BDDServices.deleteBddwithId(Number(req.params.id), decoded.decoded.id);

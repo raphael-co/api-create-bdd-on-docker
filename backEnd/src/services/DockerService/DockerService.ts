@@ -2,6 +2,7 @@
 import { exec } from 'child_process';
 import util from 'util';
 import * as net from 'net';
+import { DatabaseService } from '../DatabaseService/DatabaseService';
 
 const execCallback = util.promisify(exec);
 
@@ -43,25 +44,38 @@ export class DockerService {
         mariadb: [5601, 5700],
     };
 
-    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string):  Promise<{ containerId: string; port: number }> {
+    private static findNextAvailablePort(usedPorts: number[], type: DbType): number {
+        const range = this.portRange[type];
+        for (let port = range[0]; port <= range[1]; port++) {
+            if (!usedPorts.includes(port)) {
+                return port;
+            }
+        }
+        throw new Error(`No available ports found for ${type}`);
+    }
+
+
+    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<{ success: boolean; containerId?: string; port?: number; error?: string }> {
         let dockerCommand = 'docker';
 
-        const portStart = this.portRange[type][0];
-        const portEnd = this.portRange[type][1];
+        const availablePort = await this.findAvailablePort(this.portRange[type][0], this.portRange[type][1]);
 
-        const availablePort = await this.findAvailablePort(portStart, portEnd);
+        if (!availablePort) {
+            return { success: false, error: "No available ports found." };
+        }
 
-        let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion, availablePort); // Passer availablePort ici
+        let dockerArgs = await this.buildDockerArgs(name, type, config, dbVersion);
 
-        return new Promise((resolve, reject) => {
-            exec(`${dockerCommand} ${dockerArgs.join(' ')}`, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error creating Docker container: ${error}`);
-                    return reject(error);
-                }
-                resolve({ containerId: stdout.trim(), port: availablePort });
-            });
-        });
+        try {
+            const { stdout } = await execCallback(`${dockerCommand} ${dockerArgs.join(' ')}`);
+            const containerId = stdout.trim();
+            const getAllocatedPort = await this.getAllocatedPort(containerId, type);
+
+            return { success: true, containerId, port: getAllocatedPort };
+        } catch (error: any) {
+            console.error(`Error creating Docker container: ${error}`);
+            return { success: false, error: `Error creating Docker container: ${error.message}` };
+        }
     }
 
     static async removeContainer(containerId: string): Promise<void> {
@@ -71,21 +85,36 @@ export class DockerService {
                     console.error(`Error removing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container removed: ${containerId}`);
                 resolve();
             });
         });
     }
 
-    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string], dbVersion: string, availablePort: number): string[] {
+    private static async getAllocatedPort(containerId: string, type: DbType): Promise<number> {
+        const portMappingCommand = `docker port ${containerId}`;
+        const { stdout } = await execCallback(portMappingCommand);
+        const portMappingOutput = stdout.trim();
+
+        const regex = type === 'postgres' ? /5432\/tcp -> .+:(\d+)/ : /3306\/tcp -> .+:(\d+)/;
+        const match = portMappingOutput.match(regex);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+    private static async buildDockerArgs(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<string[]> {
         let dockerArgs: string[];
+
+        const [rows] = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo`);
+        const usedPorts = rows.map((row: { Port: number; }) => Number(row.Port));
+
+        // Trouve le prochain port disponible
+        const availablePort = this.findNextAvailablePort(usedPorts, type);
+
         if (type === "postgres") {
             dockerArgs = [
                 'run', '--name', name,
                 '--env', 'POSTGRES_PASSWORD=' + config[0],
                 '--env', 'POSTGRES_USER=' + config[1],
                 '--env', 'POSTGRES_DB=' + config[2],
-                '-p', `${availablePort}:5432`,
+                '-p', `${availablePort}:5432`, // Utilise le port disponible
                 '-d', `postgres:${dbVersion}`
             ];
         } else if (type === "mariadb") {
@@ -95,7 +124,7 @@ export class DockerService {
                 '--env', 'MARIADB_USER=' + config[1],
                 '--env', 'MARIADB_DATABASE=' + config[2],
                 '--env', 'MARIADB_ROOT_PASSWORD=' + config[3],
-                '-p', `${availablePort}:3306`,
+                '-p', `${availablePort}:3306`, // Utilise le port disponible
                 '-d', `mariadb:${dbVersion}`
             ];
         } else {
@@ -106,7 +135,6 @@ export class DockerService {
 
     static async getContainerStorageUsed(containerId: string): Promise<string> {
         try {
-            console.log(`Calculating Docker container storage used for container ID: ${containerId}`);
             const { stdout } = await execCallback(`docker inspect --format='{{json .Mounts}}' ${containerId}`);
             const mounts: Mount[] = JSON.parse(stdout.trim());
             const volumeSizesPromises = mounts.filter(mount => mount.Type === "volume").map(async (mount) => {
@@ -151,7 +179,6 @@ export class DockerService {
                     console.error(`Error restarting Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container restarted: ${containerId}`);
                 resolve();
             });
         });
@@ -164,7 +191,6 @@ export class DockerService {
                     console.error(`Error pausing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container paused: ${containerId}`);
                 resolve();
             });
         });
@@ -177,7 +203,6 @@ export class DockerService {
                     console.error(`Error unpausing Docker container: ${error}`);
                     return reject(error);
                 }
-                console.log(`Docker container unpaused: ${containerId}`);
                 resolve();
             });
         });
@@ -189,6 +214,19 @@ export class DockerService {
             return stdout.trim() === 'true';
         } catch (error) {
             console.error(`Error checking if Docker container is running: ${error}`);
+            throw error;
+        }
+    }
+    static async getContainerPorts(containerId: string): Promise<string> {
+        try {
+            const { stdout } = await execCallback(`docker port ${containerId}`);
+            const portMatch = stdout.match(/-> 0\.0\.0\.0:(\d+)/);
+            if (portMatch && portMatch[1]) {
+                return portMatch[1].trim();
+            }
+            throw new Error('No port found');
+        } catch (error) {
+            console.error(`Error fetching Docker container ports: ${error}`);
             throw error;
         }
     }

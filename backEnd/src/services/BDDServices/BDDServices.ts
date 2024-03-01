@@ -229,9 +229,19 @@ class BDDServices {
                     token: null,
                 }
             }
-            const { containerId, port } = await DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString], versionBdd);
+            console.log('createBDD');
+            
+            const { success, containerId, port, error } = await DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString], versionBdd);
 
-            const secretKey: Buffer = randomBytes(32); 
+            if (!success || !containerId || !port) {
+                return {
+                    success: false,
+                    message: error,
+                    token: null,
+                };
+            }
+
+            const secretKey: Buffer = randomBytes(32);
             const iv: Buffer = randomBytes(16);
 
             const dbInfo = {
@@ -332,9 +342,12 @@ class BDDServices {
 
             await DockerService.restartContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
 
+            const port = await DockerService.getContainerPorts(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+
             return {
                 ok: "ok",
                 data: "Database restarted successfully.",
+                port: port
             };
         } catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
@@ -386,7 +399,6 @@ class BDDServices {
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
 
-
             if (command === "stop") {
                 await DockerService.stopContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
                 return {
@@ -395,9 +407,11 @@ class BDDServices {
                 };
             } else if (command === "start") {
                 await DockerService.startContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+                const port = await DockerService.getContainerPorts(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
                 return {
                     ok: "ok",
                     data: "Database start successfully.",
+                    port: port
                 };
             } else {
                 return {

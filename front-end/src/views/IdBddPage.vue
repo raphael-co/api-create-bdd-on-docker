@@ -17,7 +17,7 @@
             <div v-if="data === 'loaded'" class="cards">
                 <GeneralBddInfoCard :bddData="bddData" />
                 <generalBddInfoConnectionsCard :bddData="bddData" />
-                <DeleteCard :bddData="bddData" @handleUpdateBddRun="handleUpdateBddRun" />
+                <DeleteCard :bddData="bddData" @handleUpdateBddRun="handleUpdateBddRun" @handleUpdateBddPort="handleUpdateBddPort" />
             </div>
         </div>
     </div>
@@ -59,8 +59,10 @@ export default {
 
         handleUpdateBddRun(newValue) {
             this.bddData.bddRun = newValue;
+        },
+        handleUpdateBddPort(newValue) {
+            this.bddData.Port = newValue;
         }
-
     },
     setup() {
         const search = ref(""); // Modifier ici pour utiliser ref
