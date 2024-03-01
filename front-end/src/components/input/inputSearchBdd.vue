@@ -29,15 +29,7 @@ export default {
 </script>
   
 <style scoped>
-.inputSearch {
-    /* width: 100%; */
-    min-width: 300px;
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    outline: none;
-}
+
 
 /* Styles spécifiques à Input */
 </style>

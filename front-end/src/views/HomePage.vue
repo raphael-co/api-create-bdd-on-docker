@@ -3,13 +3,13 @@
     <div>
       <HeaderComp />
     </div>
-    <div class="bdd-container">
+    <div class="home-page-bdd-container">
       <div>
         <h2>
           Mes Bases de données
         </h2>
       </div>
-      <div class="search">
+      <div class="home-page-search">
         <inputSearchBdd v-model="search" placeholder='Rechercher une bdd' />
         <button @click="goToCreateBdd()" class="add-db-button"><i class="fas fa-database"></i>
           Create Database</button>
@@ -90,64 +90,5 @@ export default {
   width: 170px;
 } */
 
-.home-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  max-width: 100%;
-  padding: 0 200px;
-  gap: 20px;
-}
 
-@media (max-width: 1000px) {
-  .home-page {
-    padding: 0 100px;
-  }
-
-  h2 {
-    font-size: large;
-  }
-}
-
-@media (max-width: 550px) {
-  .home-page {
-    padding: 0 20px;
-  }
-}
-
-@media (max-width: 800px) {
-  .search{
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-}
-
-.search {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.bdd-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-.add-db-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  color: #fff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.add-db-button:hover {
-  background-color: #0056b3;
-}
 </style>

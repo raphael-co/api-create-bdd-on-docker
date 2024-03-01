@@ -5,6 +5,7 @@ import RegisterPage from '../views/RegisterPage.vue';
 import { userService } from '@/request/userService';
 import IdBddPage from '../views/IdBddPage.vue';
 import CreateBddPage from '../views/CreateBddPage.vue';
+
 const routes = [
     {
         path: '/',
@@ -39,7 +40,7 @@ const routes = [
             requiresAuth: false,
             // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         }
-    },{
+    }, {
         path: '/create',
         name: 'CreateBddPage',
         component: CreateBddPage,
@@ -57,9 +58,43 @@ const router = createRouter({
 
 // Appliquez un arrière-plan pour chaque route en utilisant les métadonnées définies
 router.beforeEach((to, from, next) => {
-
+    const useDark = window.matchMedia("(prefers-color-scheme: dark)");
     const isAuthRequired = to.matched.some(record => record.meta.requiresAuth);
     const isAuthenticated = userService.getToken(); // Vérifie si l'utilisateur est connecté
+
+    console.log(useDark.matches);
+
+    let theme;
+
+    if (localStorage.getItem('theme') === 'dark') {
+        theme = 'dark';
+    } else if (localStorage.getItem('theme') === 'light') {
+        theme = 'light';
+
+    } else if (useDark.matches) {
+        localStorage.setItem('theme', 'dark');
+        theme = 'dark';
+    }
+    else {
+        localStorage.setItem('theme', 'light');
+        theme = 'light';
+    }
+
+
+    const themeStyleUrl = theme === 'dark' ? `http://localhost:8080//css/dark.css` : `http://localhost:8080/css/light.css`
+
+    let themeLink = document.getElementById('theme-style');
+
+    if (!themeLink) {
+        themeLink = document.createElement('link');
+        themeLink.id = 'theme-style';
+        themeLink.rel = 'stylesheet';
+        document.head.appendChild(themeLink);
+    }
+
+    themeLink.href = themeStyleUrl;
+
+    console.log(themeLink);
 
     if (to.meta.backgroundImage) {
         // Appliquer l'image de fond

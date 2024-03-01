@@ -1,17 +1,27 @@
 <template>
   <div id="app">
-    <div id="toast-container" class="toast-container"></div>
-    <div id="loader" class="loader-container">
-      <!-- Vous pouvez personnaliser le contenu du loader ici -->
-      <span class="loader"></span>
-    </div>
-    <router-view />
+    <AnimatedBackground v-if="true">
+
+      <div id="toast-container" class="toast-container"></div>
+      <div id="loader" class="loader-container">
+        <!-- Vous pouvez personnaliser le contenu du loader ici -->
+        <span class="loader"></span>
+      </div>
+      <div style="z-index: 1; position: relative;">
+        <router-view />
+      </div>
+    </AnimatedBackground>
+
   </div>
 </template>
 
 <script>
+import AnimatedBackground from "./components/AnimatedBackground/AnimatedBackground.vue";
 export default {
   name: 'App',
+  components: {
+    AnimatedBackground
+  }
 };
 </script>
 
@@ -42,6 +52,7 @@ body {
 .loader-container.show {
   display: flex;
 }
+
 .loader {
   width: 48px;
   height: 48px;
@@ -53,9 +64,10 @@ body {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
+
 .loader::after,
 .loader::before {
-  content: '';  
+  content: '';
   box-sizing: border-box;
   position: absolute;
   left: 0;
@@ -72,30 +84,34 @@ body {
   animation: rotationBack 0.5s linear infinite;
   transform-origin: center center;
 }
+
 .loader::before {
   width: 32px;
   height: 32px;
   border-color: #FFF #FFF transparent transparent;
   animation: rotation 1.5s linear infinite;
 }
-    
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
-} 
+}
+
 @keyframes rotationBack {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(-360deg);
   }
 }
-    
+
 
 .toast-container {
   position: fixed;
@@ -141,4 +157,5 @@ body {
 .toast.hide {
   opacity: 0;
   transform: translateX(100%);
-}</style>
+}
+</style>
