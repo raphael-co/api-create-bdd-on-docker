@@ -33,6 +33,7 @@ CREATE TABLE `bddInfo` (
   `Username` text NOT NULL,
   `Password` text NOT NULL,
   `DatabaseName` text NOT NULL,
+  `Port` int(11) NOT NULL,
   `Host` text NOT NULL,
   `Type` text NOT NULL,
   `ContainerId` text NOT NULL,

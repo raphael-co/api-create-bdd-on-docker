@@ -175,7 +175,8 @@ export const bddService = {
                     userService.logoutForce(router);
                 } else if (error.response && error.response.status === 400) {
                     hideLoader();
-                    showToast(error.response.data.message, "error", 5000);
+                    console.log(error);
+                    showToast(error.response.data.user.message, "error", 5000);
 
                 } else {
                     hideLoader();

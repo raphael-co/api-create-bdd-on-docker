@@ -2,6 +2,7 @@
 import { exec } from 'child_process';
 import util from 'util';
 import * as net from 'net';
+import { DatabaseService } from '../DatabaseService/DatabaseService';
 
 const execCallback = util.promisify(exec);
 
@@ -43,31 +44,38 @@ export class DockerService {
         mariadb: [5601, 5700],
     };
 
-    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<{ containerId: string; port: number }> {
+    private static findNextAvailablePort(usedPorts: number[], type: DbType): number {
+        const range = this.portRange[type];
+        for (let port = range[0]; port <= range[1]; port++) {
+            if (!usedPorts.includes(port)) {
+                return port;
+            }
+        }
+        throw new Error(`No available ports found for ${type}`);
+    }
+
+
+    static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<{ success: boolean; containerId?: string; port?: number; error?: string }> {
         let dockerCommand = 'docker';
 
-        const portStart = this.portRange[type][0];
-        const portEnd = this.portRange[type][1];
+        const availablePort = await this.findAvailablePort(this.portRange[type][0], this.portRange[type][1]);
 
-        //Laisse docker gerer les ports a utiliser a revenir plus tard pour voir comment gerer ce probleme de port
+        if (!availablePort) {
+            return { success: false, error: "No available ports found." };
+        }
 
-        // const availablePort = await this.findAvailablePort(portStart, portEnd);
-        // console.log(`Available port: ${availablePort}`);
+        let dockerArgs = await this.buildDockerArgs(name, type, config, dbVersion);
 
+        try {
+            const { stdout } = await execCallback(`${dockerCommand} ${dockerArgs.join(' ')}`);
+            const containerId = stdout.trim();
+            const getAllocatedPort = await this.getAllocatedPort(containerId, type);
 
-        let dockerArgs = this.buildDockerArgs(name, type, config, dbVersion);
-
-        return new Promise((resolve, reject) => {
-            exec(`${dockerCommand} ${dockerArgs.join(' ')}`, async (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error creating Docker container: ${error}`);
-                    return reject(error);
-                }
-                const getAllocatedPort = await this.getAllocatedPort(stdout.trim(), type);
-
-                resolve({ containerId: stdout.trim(), port: getAllocatedPort });
-            });
-        });
+            return { success: true, containerId, port: getAllocatedPort };
+        } catch (error: any) {
+            console.error(`Error creating Docker container: ${error}`);
+            return { success: false, error: `Error creating Docker container: ${error.message}` };
+        }
     }
 
     static async removeContainer(containerId: string): Promise<void> {
@@ -91,15 +99,22 @@ export class DockerService {
         const match = portMappingOutput.match(regex);
         return match ? parseInt(match[1], 10) : 0;
     }
-    private static buildDockerArgs(name: string, type: string, config: [string, string, string, string], dbVersion: string): string[] {
+    private static async buildDockerArgs(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<string[]> {
         let dockerArgs: string[];
+
+        const [rows] = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo`);
+        const usedPorts = rows.map((row: { Port: number; }) => Number(row.Port));
+
+        // Trouve le prochain port disponible
+        const availablePort = this.findNextAvailablePort(usedPorts, type);
+
         if (type === "postgres") {
             dockerArgs = [
                 'run', '--name', name,
                 '--env', 'POSTGRES_PASSWORD=' + config[0],
                 '--env', 'POSTGRES_USER=' + config[1],
                 '--env', 'POSTGRES_DB=' + config[2],
-                '-p', `0:5432`,
+                '-p', `${availablePort}:5432`, // Utilise le port disponible
                 '-d', `postgres:${dbVersion}`
             ];
         } else if (type === "mariadb") {
@@ -109,7 +124,7 @@ export class DockerService {
                 '--env', 'MARIADB_USER=' + config[1],
                 '--env', 'MARIADB_DATABASE=' + config[2],
                 '--env', 'MARIADB_ROOT_PASSWORD=' + config[3],
-                '-p', `0:3306`,
+                '-p', `${availablePort}:3306`, // Utilise le port disponible
                 '-d', `mariadb:${dbVersion}`
             ];
         } else {
@@ -207,7 +222,7 @@ export class DockerService {
             const { stdout } = await execCallback(`docker port ${containerId}`);
             const portMatch = stdout.match(/-> 0\.0\.0\.0:(\d+)/);
             if (portMatch && portMatch[1]) {
-                return portMatch[1].trim(); 
+                return portMatch[1].trim();
             }
             throw new Error('No port found');
         } catch (error) {

@@ -18,7 +18,13 @@ bdd.post('/create', JsonWebToken.ValidToken, validateBddInput, async (req: Reque
 
         const decoded = JsonwebtokenController.verifyJwtToken(req.headers.authorization as string)
         const user = await BDDServices.createBDD(req.body, decoded.decoded.id);
-        res.status(201).send({ user });
+
+        if (user.success) {
+            res.status(201).send({ user });
+        } else {
+            res.status(400).send({ user }); 
+        }
+        
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
