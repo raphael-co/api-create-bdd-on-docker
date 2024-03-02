@@ -56,12 +56,22 @@ const router = createRouter({
     routes,
 });
 
+
+function updateDocumentHeight() {
+    // Vous pourriez vouloir ajuster un élément spécifique ou une variable CSS ici
+    // par exemple:
+    setTimeout(() => {
+        const totalHeight = `${document.documentElement.scrollHeight}px`;
+        console.log(totalHeight);
+        document.documentElement.style.setProperty('--total-height', totalHeight);
+    }, 100);
+}
+
 // Appliquez un arrière-plan pour chaque route en utilisant les métadonnées définies
 router.beforeEach((to, from, next) => {
     // const useDark = window.matchMedia("(prefers-color-scheme: dark)");
     const isAuthRequired = to.matched.some(record => record.meta.requiresAuth);
     const isAuthenticated = userService.getToken(); // Vérifie si l'utilisateur est connecté
-
     // console.log(useDark.matches);
 
     // let theme;
@@ -116,6 +126,11 @@ router.beforeEach((to, from, next) => {
     } else {
         next(); // Dans tous les autres cas, continuer normalement
     }
+});
+
+router.afterEach(() => {
+    // Mise à jour de la hauteur après chaque changement de route
+    updateDocumentHeight();
 });
 
 export default router;
