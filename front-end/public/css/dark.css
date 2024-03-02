@@ -1,0 +1,33 @@
+:root {
+  --main-bg-color: #121212;
+  --main-color-text: #e0e0e0;
+  --color-less-main: #b0acac;
+  --logout-color: #ff5c88;
+  --logout-color-hover: rgba(241, 163, 182, 0.8);
+  --border-row: #e5e7eb;
+  --border-row-hover: #343a40;
+  --dropdown-menu-user-bg-color: #242424;
+  --dropdown-menu-user-color-hover: #3a3b3c;
+  --loading-row-1: #2a2a2a;
+  --loading-row-2: #333333;
+  --loading-row-3: #2a2a2a;
+  --add-db-button-bg: #007bff;
+  --add-db-button-bg-hover: #0056b3;
+  --add-db-button-color: white;
+  --add-db-button-color-hover: white;
+  --box-shadow-menu-user: 5px 5px 2px 0 rgba(0, 0, 0, 0.2);
+  --border-input: #555;
+  --bg-item-drodown-user-focus-hover: #3a3b3c;
+
+  --area-bg: #121212;
+  --area-bg-linear-1: #444444;
+  --area-bg-linear-2: #121212;
+  --circule-li-bg: rgba(255, 255, 255, 0.2);
+  --card-hr: white;
+
+  --card-bg: transparent;
+  --bg-modal: #313131;
+  --brightness-imgt: 9;
+  --total-height: 0px;
+}
+

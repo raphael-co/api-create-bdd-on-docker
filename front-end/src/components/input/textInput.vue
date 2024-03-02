@@ -36,21 +36,6 @@ export default {
 </script>
   
 <style scoped>
-.input-container {
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-}
 
-.custom-input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.25rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-.custom-input:focus {
-    border-color: #4169e1;
-}
 </style>
   

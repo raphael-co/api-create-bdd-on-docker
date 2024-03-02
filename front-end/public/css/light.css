@@ -1,0 +1,101 @@
+:root {
+  --main-bg-color: light;
+  --main-color-text: black;
+  --color-less-main: #808080;
+  --logout-color: #ff5c88;
+  --logout-color-hover: rgba(241, 163, 182, 0.464);
+  --border-row: #343a40;
+  --border-row-hover: #5d95c6;
+  --dropdown-menu-user-bg-color: white;
+  --dropdown-menu-user-color-hover: #f5f5f5;
+  --loading-row-1: #e0e0e0;
+  --loading-row-2: #f0f0f0;
+  --loading-row-3: #e0e0e0;
+  --add-db-button-bg: #007bff;
+  --add-db-button-bg-hover: #0056b3;
+  --add-db-button-color: white;
+  --add-db-button-color-hover: white;
+  --box-shadow-menu-user: 5px 5px 2px 0 rgba(0, 0, 0, 0.05);
+  --border-input: #ccc;
+  --bg-item-drodown-user-focus-hover: #f3f4f6;
+
+  --area-bg: #4e54c8;
+  --area-bg-linear-1: #b5d0ff;
+  --area-bg-linear-2: #7fa3a2ac;
+  --circule-li-bg: rgba(255, 255, 255, 0.637);
+  --card-hr: #374c6f;
+
+  --card-bg: white;
+  --bg-modal: #fefefe;
+  --brightness-imgt: 0;
+  --total-height: 0px;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --main-bg-color: #121212;
+    --main-color-text: #e0e0e0;
+    --color-less-main: #b0acac;
+    --logout-color: #ff5c88;
+    --logout-color-hover: rgba(241, 163, 182, 0.8);
+    --border-row: #e5e7eb;
+    --border-row-hover: #343a40;
+    --dropdown-menu-user-bg-color: #242424;
+    --dropdown-menu-user-color-hover: #3a3b3c;
+    --loading-row-1: #2a2a2a;
+    --loading-row-2: #333333;
+    --loading-row-3: #2a2a2a;
+    --add-db-button-bg: #007bff;
+    --add-db-button-bg-hover: #0056b3;
+    --add-db-button-color: white;
+    --add-db-button-color-hover: white;
+    --box-shadow-menu-user: 5px 5px 2px 0 rgba(0, 0, 0, 0.2);
+    --border-input: #555;
+    --bg-item-drodown-user-focus-hover: #3a3b3c;
+
+    --area-bg: #121212;
+    --area-bg-linear-1: #444444;
+    --area-bg-linear-2: #121212;
+    --circule-li-bg: rgba(255, 255, 255, 0.2);
+    --card-hr: white;
+
+    --card-bg: transparent;
+    --bg-modal: #313131;
+    --brightness-imgt: 9;
+  }
+
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --main-bg-color: light;
+    --main-color-text: black;
+    --color-less-main: #808080;
+    --logout-color: #ff5c88;
+    --logout-color-hover: rgba(241, 163, 182, 0.464);
+    --border-row: #343a40;
+    --border-row-hover: #5d95c6;
+    --dropdown-menu-user-bg-color: white;
+    --dropdown-menu-user-color-hover: #f5f5f5;
+    --loading-row-1: #e0e0e0;
+    --loading-row-2: #f0f0f0;
+    --loading-row-3: #e0e0e0;
+    --add-db-button-bg: #007bff;
+    --add-db-button-bg-hover: #0056b3;
+    --add-db-button-color: white;
+    --add-db-button-color-hover: white;
+    --box-shadow-menu-user: 5px 5px 2px 0 rgba(0, 0, 0, 0.05);
+    --border-input: #ccc;
+    --bg-item-drodown-user-focus-hover: #f3f4f6;
+
+    --area-bg: #4e54c8;
+    --area-bg-linear-1: #b5d0ff;
+    --area-bg-linear-2: #7fa3a2ac;
+    --circule-li-bg: rgba(255, 255, 255, 0.2);
+    --card-hr: #374c6f;
+
+    --card-bg: white;
+    --bg-modal: #fefefe;
+    --brightness-imgt: 0;
+  }
+} */

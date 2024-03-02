@@ -35,44 +35,7 @@ export default {
   
 <style scoped>
 /* Styles pour l'en-tête */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0 0 0;
-    /* Ajustez selon vos besoins */
-}
 
-
-.logo {
-    width: 150px;
-    cursor: pointer;
-}
-
-.logo img {
-    width: 100%;
-}
-
-.logout-btn {
-    padding: 10px 20px;
-    /* Ajustez selon vos besoins */
-    cursor: pointer;
-    background-color: #f44336;
-    /* Couleur rouge pour le bouton de déconnexion */
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .home-page {
-        padding: 0 50px;
-        /* Ajustement du padding pour les écrans plus petits */
-    }
-
-    /* Ajoutez ici d'autres styles responsive si nécessaire */
-}
 </style>
 
   

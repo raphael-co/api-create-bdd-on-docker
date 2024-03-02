@@ -1,24 +1,24 @@
 <template>
-    <div class="table-placeholder">
+    <div class="table-all-bdd">
         <!-- Entêtes de colonne -->
-        <div class="row">
-            <div class="celluleRow">Id</div>
-            <div class="celluleRow">Name</div>
-            <div class="celluleRow">Status</div>
-            <div class="celluleRow">Storage</div>
-            <div class="celluleRow">Type</div>
+        <div class="table-all-bdd-row">
+            <div class="table-all-bdd-celluleRow">Id</div>
+            <div class="table-all-bdd-celluleRow">Name</div>
+            <div class="table-all-bdd-celluleRow">status</div>
+            <div class="table-all-bdd-celluleRow">Storage</div>
+            <div class="table-all-bdd-celluleRow">Type</div>
         </div>
-        <div class="row rows" v-for="(bdd, index) in filteredBddData" :key="index" @click="goToBddPage(bdd.id)">
-            <div class="celluleRow">{{ bdd.id ? bdd.id : 'no id' }}</div>
-            <div class="celluleRow">{{ bdd.Name ? bdd.Name : 'no name' }}</div>
-            <span class="status" style="color: rgb(48, 198, 180)" v-if="bdd?.bddRun"><span
+        <div class="table-all-bdd-row table-all-bdd-rows" v-for="(bdd, index) in filteredBddData" :key="index" @click="goToBddPage(bdd.id)">
+            <div class="table-all-bdd-celluleRow">{{ bdd.id ? bdd.id : 'no id' }}</div>
+            <div class="table-all-bdd-celluleRow">{{ bdd.Name ? bdd.Name : 'no name' }}</div>
+            <span class="table-all-bdd-status" style="color: rgb(48, 198, 180)" v-if="bdd?.bddRun"><span
                     style="color: rgb(48, 198, 180);font-size: larger">•</span>
                 available</span>
-            <span v-else class="status" style="color: rgb(251, 71, 116)"><span
+            <span v-else class="table-all-bdd-status" style="color: rgb(251, 71, 116)"><span
                     style="color: rgb(251, 71, 116);font-size: larger">•</span>
                 unavailable</span>
-            <div class="celluleRow">{{ bdd.StorageRemaining ? bdd.StorageRemaining : 'no type' }}</div>
-            <div class="celluleRow">{{ bdd.Type ? bdd.Type : 'no type' }}</div>
+            <div class="table-all-bdd-celluleRow">{{ bdd.StorageRemaining ? bdd.StorageRemaining : 'no type' }}</div>
+            <div class="table-all-bdd-celluleRow">{{ bdd.Type ? bdd.Type : 'no type' }}</div>
         </div>
     </div>
 </template>
@@ -66,83 +66,6 @@ export default {
 
   
 <style scoped>
-.table-placeholder {
-    border-radius: 4px;
-    width: 100%;
-    /* Ajustez à la largeur désirée */
-}
 
-.celluleRow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-    width: 100%;
-}
-
-.status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-    width: 100%;
-}
-
-.header {
-    height: 20px;
-    background: #f0f0f0;
-    margin-bottom: 10px;
-}
-
-.row {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    height: 60px;
-    border-bottom: 0.5px solid #e5e7eb;
-    font-size: medium
-}
-
-.rows:hover {
-    background-color: #e5e7eb;
-    cursor: pointer;
-}
-
-
-.cell {
-    height: 20px;
-    background: #e0e0e0;
-    flex-grow: 1;
-    margin-right: 10px;
-}
-
-.cell:last-child {
-    margin-right: 0;
-}
-
-.cell:last-child {
-    margin-right: 0;
-}
-
-/* Animation */
-@keyframes loading {
-    0% {
-        background-color: #e0e0e0;
-    }
-
-    50% {
-        background-color: #f0f0f0;
-    }
-
-    100% {
-        background-color: #e0e0e0;
-    }
-}
-
-.header,
-.cell {
-    animation: loading 1.5s infinite;
-}
 </style>
   

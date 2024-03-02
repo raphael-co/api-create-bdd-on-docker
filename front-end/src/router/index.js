@@ -5,6 +5,7 @@ import RegisterPage from '../views/RegisterPage.vue';
 import { userService } from '@/request/userService';
 import IdBddPage from '../views/IdBddPage.vue';
 import CreateBddPage from '../views/CreateBddPage.vue';
+
 const routes = [
     {
         path: '/',
@@ -39,7 +40,7 @@ const routes = [
             requiresAuth: false,
             // backgroundImage: `url(${require('@/assets/LoginBackground.svg')})`
         }
-    },{
+    }, {
         path: '/create',
         name: 'CreateBddPage',
         component: CreateBddPage,
@@ -55,11 +56,57 @@ const router = createRouter({
     routes,
 });
 
+
+function updateDocumentHeight() {
+    // Vous pourriez vouloir ajuster un élément spécifique ou une variable CSS ici
+    // par exemple:
+    setTimeout(() => {
+        const totalHeight = `${document.documentElement.scrollHeight}px`;
+        console.log(totalHeight);
+        document.documentElement.style.setProperty('--total-height', totalHeight);
+    }, 100);
+}
+
 // Appliquez un arrière-plan pour chaque route en utilisant les métadonnées définies
 router.beforeEach((to, from, next) => {
-
+    // const useDark = window.matchMedia("(prefers-color-scheme: dark)");
     const isAuthRequired = to.matched.some(record => record.meta.requiresAuth);
     const isAuthenticated = userService.getToken(); // Vérifie si l'utilisateur est connecté
+    // console.log(useDark.matches);
+
+    // let theme;
+
+    // if (localStorage.getItem('theme') === 'dark') {
+    //     document.body.style.backgroundColor = 'black';
+    //     theme = 'dark';
+    // } else if (localStorage.getItem('theme') === 'light') {
+    //     document.body.style.backgroundColor = 'white';
+    //     theme = 'light';
+
+    // } else if (useDark.matches) {
+    //     document.body.style.backgroundColor = 'black';
+    //     localStorage.setItem('theme', 'dark');
+    //     theme = 'dark';
+    // }
+    // else {
+    //     document.body.style.backgroundColor = 'white';
+    //     localStorage.setItem('theme', 'light');
+    //     theme = 'light';
+    // }
+
+
+    // const themeStyleUrl = theme === 'dark' ? `http://localhost:8080//css/dark.css` : `http://localhost:8080/css/light.css`
+
+    // let themeLink = document.getElementById('theme-style');
+
+    // if (!themeLink) {
+    //     themeLink = document.createElement('link');
+    //     themeLink.id = 'theme-style';
+    //     themeLink.rel = 'stylesheet';
+    //     document.head.appendChild(themeLink);
+    // }
+
+    // themeLink.href = themeStyleUrl;
 
     if (to.meta.backgroundImage) {
         // Appliquer l'image de fond
@@ -79,6 +126,11 @@ router.beforeEach((to, from, next) => {
     } else {
         next(); // Dans tous les autres cas, continuer normalement
     }
+});
+
+router.afterEach(() => {
+    // Mise à jour de la hauteur après chaque changement de route
+    updateDocumentHeight();
 });
 
 export default router;
