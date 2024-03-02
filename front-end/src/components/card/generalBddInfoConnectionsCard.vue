@@ -1,6 +1,6 @@
 <template>
-    <div id="Connection" class="cardRegister-container">
-        <div class="cardRegister">
+    <div id="Connection" class="cardType-container">
+        <div class="cardType">
             <div>
                 <h2>
                     Connections
@@ -84,82 +84,6 @@ export default {
 </script>
   
 <style scoped>
-.cardRegister {
-    padding: 15px 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
 
-.cardRegister hr {
-    width: 100%;
-    border: #374c6f 1px solid;
-}
-
-
-.infoGe {
-    height: 100%;
-    display: flex;
-    width: 100%;
-    align-items: center;
-
-}
-
-.cardRegister-container {
-
-    width: 100%;
-    /* Utilisez 100% pour la largeur pour s'adapter à la largeur de l'écran */
-    /* Optionnel: ajoutez une largeur maximale pour éviter que la carte ne devienne trop large sur les grands écrans */
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    border: #374c6f 1px solid;
-    /* Centre la carte horizontalement */
-}
-
-.infoGeneral {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    height: 60px;
-    align-items: center;
-}
-
-.infoGeneral>* {
-    min-width: 0;
-    /* Ceci permet aux enfants de `.infoGeneral` de ne pas déborder */
-}
-
-
-
-
-.infoTitleGe {
-    width: 120px;
-    color: #374c6f;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-h2 {
-    color: #374c6f;
-    text-align: center;
-    float: left;
-}
-
-@media screen and (max-width: 800px) {
-    .infoGeneral {
-        flex-direction: column;
-    }
-
-    .infoTitleGe {
-        width: 100%;
-        text-align: center
-    }
-
-    h2 {
-        width: 100%;
-        text-align: center
-    }
-}
 </style>
   

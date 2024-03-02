@@ -62,7 +62,7 @@ label {
     position: relative;
     right: 0;
     left: 0;
-    width: 116px;
+    width: 60px;
     height: 30px;
     margin: 0 auto;
     background-color: #77b5fe;
@@ -134,7 +134,7 @@ label {
 
 #toggle_checkbox:checked+label #star {
     top: 3px;
-    left: 90px;
+    left: 34px;
     transform: scale(0.3);
     background-color: yellow;
 }

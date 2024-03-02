@@ -8,7 +8,7 @@
         </div>
 
         <div class="dropdown-menu-user" aria-labelledby="user-menu-button" v-show="isMenuOpen" ref="menu">
-            <a class="dropdown-item"><ToggleSwitchTheme /></a>
+            <!-- <a class="dropdown-item"><ToggleSwitchTheme /></a> -->
             <a @click="logoutBtn" class="dropdown-item logout">Sign out</a>
         </div>
     </div>
@@ -19,12 +19,12 @@
 <script>
 import { useRouter } from 'vue-router';
 import { userService } from '../../request/userService';
-import ToggleSwitchTheme from '../toggle-switch/toggle-switch-theme.vue';
+// import ToggleSwitchTheme from '../toggle-switch/toggle-switch-theme.vue';
 
 export default {
     name: "DropdownUser",
     components: {
-        ToggleSwitchTheme
+        // ToggleSwitchTheme
     },
     data() {
         const router = useRouter();

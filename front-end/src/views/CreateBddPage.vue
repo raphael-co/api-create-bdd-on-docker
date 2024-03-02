@@ -116,56 +116,6 @@ export default {
   
   
 <style scoped>
-.createBdd-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    max-width: 100%;
-    padding: 0 200px;
-    gap: 20px;
-}
 
-.btnCreate {
-    background-color: #6f66e1;
-    color: white;
-    border: none;
-    padding: 15px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    width: 200px
-}
-
-.btnCreate:hover {
-    background-color: #5046e5;
-}
-
-.dropdown {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.createBdd-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-@media (max-width: 1000px) {
-    .createBdd-page {
-        padding: 0 100px;
-    }
-
-    h2 {
-        font-size: large;
-    }
-}
-
-@media (max-width: 550px) {
-    .createBdd-page {
-        padding: 0 20px;
-    }
-}
 </style>
   

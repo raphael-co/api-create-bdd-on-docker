@@ -1,5 +1,6 @@
 <template>
   <!-- <AnimatedBackground> -->
+    <!-- <ToggleSwitchTheme /> -->
     <div class="register-container">
       <div class="form-container">
         <RegisterForm />
@@ -17,14 +18,13 @@ export default {
   name: 'RegisterPage',
   components: {
     RegisterForm,
-    cardRegister,
+    cardRegister
     // AnimatedBackground
   }
 };
 </script>
   
 <style scoped>
-/* Styles spécifiques à Register */
 
 </style>
   
