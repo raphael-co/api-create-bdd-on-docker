@@ -29,7 +29,7 @@ app.get('/', async (req: Request, res: Response): Promise<Response> => {
     });
   });
 
-app.listen(process.env.PORT || 4000, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log('running socket');
   process.env.PORT ? console.log(`server : http://localhost:${env.PORT}/`) : console.log(`local : http://localhost:4000/`);
 
