@@ -36,7 +36,8 @@ export default {
                 await navigator.clipboard.writeText(this.text);
                 showToast('Text copied to clipboard!', "success");
             } catch (err) {
-                showToast('Text copied to clipboard!', "error");
+                showToast('Text copied to clipboard!', 'error', 5000);
+                console.error('Failed to copy text:', err);
                 alert('Failed to copy text.');
             }
         },

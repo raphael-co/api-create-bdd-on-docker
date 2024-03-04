@@ -229,7 +229,6 @@ class BDDServices {
                     token: null,
                 }
             }
-            console.log('createBDD');
 
             const { success, containerId, port, error } = await DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString], versionBdd);
 
@@ -257,12 +256,6 @@ class BDDServices {
                 userid: userid
             };
 
-            console.log(secretKey.length);
-
-            console.log("-------------------");
-
-            console.log(process.env.SECRET_KEY.length);
-
             const values = [
                 userid,
                 JSON.stringify(Cryptage.encrypt(dbInfo.Username, secretKey, iv)),
@@ -276,26 +269,15 @@ class BDDServices {
                 JSON.stringify(Cryptage.encrypt(dbInfo.versionBdd, secretKey, iv)),
             ];
 
-            console.log("afer values");
-
             const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name,VersionBdd) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
-            console.log("afer query");
-
             const [insertResults] = await DatabaseService.queryDatabase(query, values);
-
-            console.log("afer insertResults");
 
             let id = insertResults.insertId;
 
             const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
-            console.log("afer secretKeyBuffer");
 
-            console.log(secretKeyBuffer);
-            console.log(secretKeyBuffer.length);
             const encryptedSecretKey = JSON.stringify(Cryptage.encrypt(JSON.stringify(secretKey), secretKeyBuffer, iv));
-
-            console.log("afer encryptedSecretKey");
 
             const querySecret = `INSERT INTO secretKey (idBdd, secretKey) VALUES (?, ?)`;
             const valuesSecret = [id, encryptedSecretKey];
@@ -347,8 +329,6 @@ class BDDServices {
         if (typeof process.env.SECRET_KEY === 'undefined') {
             throw new Error('SECRET_KEY is not defined in the environment variables');
         }
-
-        console.log(process.env.SECRET_KEY.length);
 
         const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
