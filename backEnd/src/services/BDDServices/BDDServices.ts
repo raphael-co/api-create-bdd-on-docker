@@ -291,6 +291,8 @@ class BDDServices {
             const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
             console.log("afer secretKeyBuffer");
 
+            console.log(secretKeyBuffer);
+            console.log(secretKeyBuffer.length);
             const encryptedSecretKey = JSON.stringify(Cryptage.encrypt(JSON.stringify(secretKey), secretKeyBuffer, iv));
 
             console.log("afer encryptedSecretKey");

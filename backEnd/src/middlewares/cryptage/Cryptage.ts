@@ -8,6 +8,9 @@ export interface EncryptedData {
 
 class Cryptage {
     static encrypt(text: string | Buffer, secretKey: Buffer, iv: Buffer): EncryptedData {
+
+        console.log(secretKey);
+        
         const cipher = createCipheriv('aes-256-gcm' as CipherGCMTypes, secretKey, iv);
         let encrypted: string;
         
