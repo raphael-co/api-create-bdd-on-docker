@@ -16,7 +16,12 @@ console.log(env.PORT);
 console.log(`Ready on ${env.NODE_ENV} mode`)//express
 const app: Application = express();
 
-app.use(cors());
+app.use(cors({
+  origin: '192.168.1.196', // Spécifiez les origines autorisées ou utilisez une fonction pour une logique plus complexe
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
+  allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
+}));
+
 app.use(helmet());
 
 app.use(express.json());
