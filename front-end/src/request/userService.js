@@ -54,7 +54,11 @@ export const userService = {
     async login(credentials) {
         showLoader();
         try {
-            const response = await axios.post(`${url}/user/login`, credentials);
+            const config = {
+                withCredentials: true
+            };
+
+            const response = await axios.post(`${url}/user/login`, credentials, config);
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);
             // router.push({ name: 'HomePage' });
@@ -76,10 +80,14 @@ export const userService = {
         }
     },
 
-    async register(credentials,router) {
+    async register(credentials, router) {
         showLoader();
         try {
-            const response = await axios.post(`${url}/user/register`, credentials);
+            const config = {
+                withCredentials: true
+            };
+
+            const response = await axios.post(`${url}/user/register`, credentials, config);
 
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);

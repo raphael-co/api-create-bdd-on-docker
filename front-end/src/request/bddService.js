@@ -11,6 +11,7 @@ export const bddService = {
     async getBddData(router) {
 
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
@@ -30,6 +31,7 @@ export const bddService = {
     async getBddDataid(router) {
 
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
@@ -49,6 +51,7 @@ export const bddService = {
     async breakdatabase(command, bddId, router) {
         showLoader();
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
@@ -88,6 +91,7 @@ export const bddService = {
     async restartdatabase(bddId, router) {
         showLoader();
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
@@ -125,6 +129,7 @@ export const bddService = {
     async deletedatabase(bddId, deleteConfirmation, router) {
         showLoader();
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
@@ -159,6 +164,7 @@ export const bddService = {
     async createDatabase(credentials, router) {
         showLoader();
         const config = {
+            withCredentials: true,
             headers: {
                 Authorization: userService.getToken()
             }
