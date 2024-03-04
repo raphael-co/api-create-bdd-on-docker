@@ -1,6 +1,6 @@
 // userService.js
 import axios from 'axios';
-
+import { url } from "./bddService";
 export function showLoader() {
     // Ajoute la classe 'show' à l'élément du loader
     document.getElementById('loader').classList.add('show');
@@ -54,7 +54,7 @@ export const userService = {
     async login(credentials) {
         showLoader();
         try {
-            const response = await axios.post('http://localhost:3000/user/login', credentials);
+            const response = await axios.post(`${url}/user/login`, credentials);
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);
             // router.push({ name: 'HomePage' });
@@ -79,7 +79,7 @@ export const userService = {
     async register(credentials,router) {
         showLoader();
         try {
-            const response = await axios.post('http://localhost:3000/user/register', credentials);
+            const response = await axios.post(`${url}/user/register`, credentials);
 
             showToast(`Success: ${response.data.user.message}`, "success", 5000);
             this.saveToken(response.data.user.token);

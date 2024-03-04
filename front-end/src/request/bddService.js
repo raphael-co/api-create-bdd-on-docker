@@ -4,6 +4,8 @@ import { userService } from "./userService";
 import { showToast, showLoader, hideLoader } from "./userService";
 // import hideLoader from "./userService";
 
+export const url = "http://192.168.1.196:3000";
+
 export const bddService = {
     // Fonction pour effectuer une requête GET
     async getBddData(router) {
@@ -13,7 +15,7 @@ export const bddService = {
                 Authorization: userService.getToken()
             }
         };
-        return axios.get('http://localhost:3000/bdd', config)
+        return axios.get(`${url}/bdd`, config)
             .then(response => response.data)
             .catch(error => {
                 console.error('There was an error!', error);
@@ -32,7 +34,7 @@ export const bddService = {
                 Authorization: userService.getToken()
             }
         };
-        return axios.get(`http://localhost:3000/bdd/${router.currentRoute.value.params.idBdd}`, config)
+        return axios.get(`${url}/bdd/${router.currentRoute.value.params.idBdd}`, config)
             .then(response => response.data)
             .catch(error => {
                 console.error('There was an error!', error);
@@ -57,7 +59,7 @@ export const bddService = {
             bddId
         };
 
-        return axios.post(`http://localhost:3000/bdd/break`, data, config)
+        return axios.post(`${url}/bdd/break`, data, config)
             .then(response => {
                 // Traitement de la réponse
                 hideLoader();
@@ -95,7 +97,7 @@ export const bddService = {
             bddId
         };
 
-        return axios.post(`http://localhost:3000/bdd/restart`, data, config)
+        return axios.post(`${url}/bdd/restart`, data, config)
             .then(response => {
                 // Traitement de la réponse
                 hideLoader();
@@ -130,7 +132,7 @@ export const bddService = {
         const data = {
             confirmDelete: deleteConfirmation
         };
-        return axios.post(`http://localhost:3000/bdd/delete/${bddId}`, data, config)
+        return axios.post(`${url}/bdd/delete/${bddId}`, data, config)
             .then(response => {
                 // Traitement de la réponse
                 hideLoader();
@@ -162,7 +164,7 @@ export const bddService = {
             }
         };
 
-        return axios.post(`http://localhost:3000/bdd/create`, credentials, config)
+        return axios.post(`${url}/bdd/create`, credentials, config)
             .then(response => {
                 hideLoader();
                 showToast(" La base de données a bien été créée", "success", 5000);
