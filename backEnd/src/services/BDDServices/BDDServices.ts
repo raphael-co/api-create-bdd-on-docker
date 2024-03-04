@@ -230,7 +230,7 @@ class BDDServices {
                 }
             }
             console.log('createBDD');
-            
+
             const { success, containerId, port, error } = await DockerService.createContainer(name, type, [genereatePasswordString, generateUsernameString, databaseName, genereatePasswordString], versionBdd);
 
             if (!success || !containerId || !port) {
@@ -256,6 +256,13 @@ class BDDServices {
                 ContainerId: containerId,
                 userid: userid
             };
+
+            console.log(secretKey.length);
+
+            console.log("-------------------");
+
+            console.log(process.env.SECRET_KEY.length);
+
 
             const values = [
                 userid,
@@ -328,6 +335,8 @@ class BDDServices {
         if (typeof process.env.SECRET_KEY === 'undefined') {
             throw new Error('SECRET_KEY is not defined in the environment variables');
         }
+
+        console.log(process.env.SECRET_KEY.length);
 
         const secretKeyBuffer = Buffer.from(process.env.SECRET_KEY, 'hex');
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
