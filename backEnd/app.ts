@@ -21,8 +21,8 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-app.use(cors());
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 app.use('/', routes);
