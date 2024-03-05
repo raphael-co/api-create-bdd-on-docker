@@ -17,7 +17,7 @@ console.log(`Ready on ${env.NODE_ENV} mode`)//express
 const app: Application = express();
 
 app.use(cors({
-  origin: 'http://192.168.1.196:8080', // Assurez-vous que le port correspond au port de votre front-end
+  origin: ['http://192.168.1.196:8080','http://raphael.netgraph.fr'], // Assurez-vous que le port correspond au port de votre front-end
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
