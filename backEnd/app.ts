@@ -25,9 +25,9 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
-app.use('/', routes);
+app.use('/api', routes);
 
-app.get('/', async (req: Request, res: Response): Promise<Response> => {
+app.get('/api', async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).send({
     message: 'API is up and running',
   });
