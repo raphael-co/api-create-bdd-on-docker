@@ -15,13 +15,14 @@ const app: Application = express();
 
 // Configuration CORS pour autoriser votre front-end
 const corsOptions = {
-  origin: ['http://192.168.1.196:8080', 'http://raphael.netgraph.fr', 'https://raphael.netgraph.fr'], // Ajoutez également la version HTTPS si nécessaire
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Assurez-vous d'inclure 'OPTIONS' pour les requêtes preflight
-  credentials: true, // Cela est nécessaire pour les cookies de session côté client
+  origin: ['http://192.168.1.196:8080', 'http://raphael.netgraph.fr', 'https://raphael.netgraph.fr'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+  credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
+app.options('*', cors());
 app.use(helmet());
 app.use(express.json());
 app.use('/', routes);
