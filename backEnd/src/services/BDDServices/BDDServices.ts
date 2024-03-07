@@ -245,7 +245,7 @@ class BDDServices {
             const secretKey: Buffer = randomBytes(32);
             const iv: Buffer = randomBytes(16);
 
-            const host = `localhost:${port}`;
+            const host = `http://192.168.1.196:${port}`;
             const hostHash = await HashPassword.hashPassword(host);
 
             const dbInfo = {
