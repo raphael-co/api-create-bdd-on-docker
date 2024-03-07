@@ -39,7 +39,9 @@ CREATE TABLE `bddInfo` (
   `ContainerId` text NOT NULL,
   `Name` text NOT NULL,
   `Create_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `VersionBdd` varchar(255) NOT NULL
+  `VersionBdd` varchar(255) NOT NULL,
+  `Address` text NOT NULL,
+  `HashAdress` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
