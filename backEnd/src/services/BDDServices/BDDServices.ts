@@ -246,7 +246,7 @@ class BDDServices {
             const iv: Buffer = randomBytes(16);
 
             const host = `http://192.168.1.196:${port}`;
-            const hostHash = await HashPassword.hashPassword(host);
+            const hostHash = crypto.randomUUID();
 
             const dbInfo = {
                 Name: name,
