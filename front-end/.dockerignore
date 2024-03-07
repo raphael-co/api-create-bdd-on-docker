@@ -5,3 +5,5 @@ Dockerfile
 **/dist
 .dockerignore
 README.md
+**/node_modules
+**/dist
