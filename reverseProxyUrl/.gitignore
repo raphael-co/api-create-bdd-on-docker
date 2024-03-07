@@ -1,0 +1,31 @@
+# Ignore les fichiers et répertoires générés par le système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Ignore les répertoires node_modules créés par npm
+node_modules/
+/node_modules
+
+
+# Ignore les fichiers de configuration d'éditeur
+.vscode/
+.idea/
+
+# Ignore les fichiers de logs
+logs/
+*.log
+
+# Ignore les fichiers de configuration de l'environnement
+.env
+
+# Ignore les fichiers de build et de distribution
+/dist
+/build
+
+# Ignore les fichiers de sauvegarde et temporaires
+*.bak
+*.tmp
+
+# Ignore les dépendances installées
+package-lock.json
+.package-lock.json

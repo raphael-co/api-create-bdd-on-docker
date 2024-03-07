@@ -6,6 +6,7 @@ import genereateusername from '../../middlewares/bdd/generateUsername';
 import Cryptage, { EncryptedData } from '../../middlewares/cryptage/Cryptage';
 import { DockerService } from '../DockerService/DockerService';
 import { DatabaseService } from '../DatabaseService/DatabaseService';
+import HashPassword from '../../middlewares/user/HashPassword';
 
 
 class BDDServices {
@@ -136,7 +137,8 @@ class BDDServices {
                 VersionBdd: Cryptage.decrypt(JSON.parse(rows[0].VersionBdd), keyBuffer),
                 StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
                 bddRun: bddRun,
-                createAt: rows[0].Create_at
+                createAt: rows[0].Create_at,
+                HashAdress : rows[0].HashAdress
             };
 
             return {
@@ -243,6 +245,9 @@ class BDDServices {
             const secretKey: Buffer = randomBytes(32);
             const iv: Buffer = randomBytes(16);
 
+            const host = `http://192.168.1.196:${port}`;
+            const hostHash = await HashPassword.hashPassword(host);
+
             const dbInfo = {
                 Name: name,
                 versionBdd: versionBdd,
@@ -253,7 +258,9 @@ class BDDServices {
                 Username: generateUsernameString,
                 Password: genereatePasswordString,
                 ContainerId: containerId,
-                userid: userid
+                userid: userid,
+                host: host,
+                hostHash: hostHash
             };
 
             const values = [
@@ -267,9 +274,11 @@ class BDDServices {
                 JSON.stringify(Cryptage.encrypt(dbInfo.ContainerId, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.Name, secretKey, iv)),
                 JSON.stringify(Cryptage.encrypt(dbInfo.versionBdd, secretKey, iv)),
+                dbInfo.host,
+                dbInfo.hostHash
             ];
 
-            const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name,VersionBdd) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?,?)`;
+            const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name,VersionBdd,Address,HashAdress) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`;
 
             const [insertResults] = await DatabaseService.queryDatabase(query, values);
 

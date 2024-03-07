@@ -1,23 +1,6 @@
 version: '3.8'
-services:
-  app:
-    image: api-create-bdd-on-docker
-    ports:
-      - "3000:3000"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      mysql_secret:
-        condition: service_healthy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
 
+services:
   mysql:
     image: mysql:8.0
     environment:
@@ -29,7 +12,7 @@ services:
       - mysql-data:/var/lib/mysql
       - ./init-bddStokage.sql:/docker-entrypoint-initdb.d/init-bddStokage.sql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -45,10 +28,52 @@ services:
       - mysql-secret-data:/var/lib/mysql
       - ./init-secret-Key.sql:/docker-entrypoint-initdb.d/init-secret-Key.sql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
       interval: 10s
+
+  backend-app:
+    build: ../backEnd
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+      - mysql_secret
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  frontend-app:
+    build: ../front-end
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend-app
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  reverse-proxy:
+    build: ../reverseProxyUrl
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend-app
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
 volumes:
   mysql-data:
