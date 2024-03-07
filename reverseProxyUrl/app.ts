@@ -8,10 +8,6 @@ import routes from './src/routes/routes';
 dotenv.config()
 
 const env: any = process.env
-
-console.log(env.PORT);
-console.log(`Ready on ${env.NODE_ENV} mode`)
-
 const app: Application = express();
 
 // Configuration CORS pour autoriser votre front-end
@@ -34,9 +30,9 @@ app.get('/dbb', async (req: Request, res: Response): Promise<Response> => {
   });
 });
 
-console.log(`Ready on ${env.PORT} mode`);
+console.log(`Ready on ${env.PORTUrl} mode`);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORTUrl || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

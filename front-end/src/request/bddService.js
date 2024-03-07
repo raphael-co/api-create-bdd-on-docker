@@ -4,7 +4,7 @@ import { userService } from "./userService";
 import { showToast, showLoader, hideLoader } from "./userService";
 // import hideLoader from "./userService";
 
-export const url = "https://raphael.netgraph.fr/api";
+export const url = "http://localhost:3000/api";
 
 export const bddService = {
     // Fonction pour effectuer une requête GET
