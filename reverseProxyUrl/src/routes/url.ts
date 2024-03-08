@@ -7,7 +7,9 @@ const url = Router();
 
 url.post('/:url/:bdd', async (req: Request, res: Response) => {
     try {
-
+        console.log('url', req.params.url);
+        console.log('bdd', req.params.bdd);
+        
         const result = await UrlServices.redirect(req.params.url, req.params.bdd);
 
         if (result.success) {
