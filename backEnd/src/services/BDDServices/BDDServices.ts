@@ -203,7 +203,8 @@ class BDDServices {
                     bddRun: bddRun
                 };
             }));
-
+            console.log(bdds);
+        
             return {
                 ok: "ok",
                 data: bdds

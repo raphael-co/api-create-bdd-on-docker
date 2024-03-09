@@ -15,7 +15,7 @@ const app: Application = express();
 
 // Configuration CORS pour autoriser votre front-end
 const corsOptions = {
-  origin: ['http://192.168.1.196:8080', 'http://raphael.netgraph.fr', 'https://raphael.netgraph.fr','http://192.168.1.87:80','http://192.168.1.87:22','localhost:8080','http://localhost:8080'],
+  origin: ['http://192.168.1.196:8080', 'http://raphael.netgraph.fr', 'https://raphael.netgraph.fr','http://192.168.1.87:80','http://192.168.1.87:22','http://localhost:8081/login','http://localhost:8080/login','http://localhost:8080'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization']
