@@ -62,6 +62,7 @@ export default {
           bddData.value = response.user.data; // Assurez-vous que la réponse correspond à ce que vous attendez
         })
         .catch(err => {
+          console.log(err);
           data.value = 'error';
           error.value = err;
         });

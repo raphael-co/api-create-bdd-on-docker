@@ -22,9 +22,9 @@ bdd.post('/create', JsonWebToken.ValidToken, validateBddInput, async (req: Reque
         if (user.success) {
             res.status(201).send({ user });
         } else {
-            res.status(400).send({ user }); 
+            res.status(400).send({ user });
         }
-        
+
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
@@ -88,8 +88,12 @@ bdd.get('/', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
         const result = await BDDServices.getAllBdd(decoded.decoded.id);
 
         const user = Array.isArray(result) ? result[0] : result;
+        console.log(user);
+
         res.status(201).send({ user: user });
     } catch (error: unknown) {
+        console.log(error);
+
         if (error instanceof Error) {
             res.status(500).send({ message: error.message });
         } else {

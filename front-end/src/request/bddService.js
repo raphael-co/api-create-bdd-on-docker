@@ -17,8 +17,12 @@ export const bddService = {
             }
         };
         return axios.get(`${url}/bdd`, config)
-            .then(response => response.data)
+            .then(response => {
+                console.log(response);
+                return response.data
+            })
             .catch(error => {
+                console.log(error);
                 console.error('There was an error!', error);
                 if (error.response.status === 401) {
                     showToast("Veuillez vous connecter à nouveau", "error", 5000);
