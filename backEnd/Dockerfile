@@ -27,6 +27,8 @@ COPY . .
 # Compiler le code TypeScript en JavaScript
 RUN npm run build
 
+COPY ./src/cert /usr/src/app/dist/src/cert
+
 # Exposer le port de votre application
 EXPOSE 3000
 
