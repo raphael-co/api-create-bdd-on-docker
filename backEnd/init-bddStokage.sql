@@ -58,7 +58,8 @@ CREATE TABLE `bddInfo` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `mail` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `role` VARCHAR(255) NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

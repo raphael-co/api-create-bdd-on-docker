@@ -7,6 +7,7 @@ import Cryptage, { EncryptedData } from '../../middlewares/cryptage/Cryptage';
 import { DockerService } from '../DockerService/DockerService';
 import { DatabaseService } from '../DatabaseService/DatabaseService';
 import HashPassword from '../../middlewares/user/HashPassword';
+import { PortsCheck } from '../PortsCheck/PortsCheck';
 
 
 class BDDServices {
@@ -65,6 +66,8 @@ class BDDServices {
 
             await DockerService.removeContainer(containerId);
 
+            await PortsCheck.closePort(rows[0].Port);
+
             await DatabaseService.queryDatabase(
                 `DELETE FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
@@ -122,7 +125,7 @@ class BDDServices {
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
             const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
-            const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+            const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer)) && await PortsCheck.isPortEnabled(Number(rows[0].Port));
 
             const infobdd = {
                 id: rows[0].id,
@@ -138,7 +141,7 @@ class BDDServices {
                 StorageRemaining: storageRemaining, // Ajout de l'espace de stockage restant
                 bddRun: bddRun,
                 createAt: rows[0].Create_at,
-                HashAdress : rows[0].HashAdress
+                HashAdress: rows[0].HashAdress
             };
 
             return {
@@ -186,7 +189,20 @@ class BDDServices {
 
                 const keyBuffer = Buffer.from(JSON.parse(decryptedSecretKey).data);
                 const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
-                const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
+                const bddRun = await DockerService.isContainerRunning(Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer)) && await PortsCheck.isPortEnabled(Number(row.Port));
+
+                // let bddRun = false; // Défaut à false
+
+                // try {
+                //     const isContainerRunning = await DockerService.isContainerRunning( Cryptage.decrypt(JSON.parse(row.ContainerId), keyBuffer));
+                //     const isPortEnabled = await PortsCheck.isPortEnabled(Number(row.Port));
+
+                //     // La variable bddRun sera true si et seulement si le conteneur est en cours d'exécution ET le port est activé
+                //     bddRun = isContainerRunning && isPortEnabled;
+                // } catch (error) {
+                //     console.error('Erreur lors de la vérification de l\'état du conteneur ou du port:', error);
+                //     // bddRun reste false en cas d'erreur
+                // }
                 return {
                     id: row.id,
                     Name: Cryptage.decrypt(JSON.parse(row.Name), keyBuffer),
@@ -203,8 +219,6 @@ class BDDServices {
                     bddRun: bddRun
                 };
             }));
-            console.log(bdds);
-        
             return {
                 ok: "ok",
                 data: bdds
@@ -293,6 +307,14 @@ class BDDServices {
             const valuesSecret = [id, encryptedSecretKey];
 
             await DatabaseService.querySecretDatabase(querySecret, valuesSecret);
+            const portOpenResult = await PortsCheck.openPort(port, dbInfo.ContainerId);
+
+            if (!portOpenResult.success) {
+                console.error(`Failed to open port: ${portOpenResult.message}`);
+                await DockerService.stopContainer(dbInfo.ContainerId);
+                await DockerService.removeContainer(dbInfo.ContainerId);
+                return { success: false, message: `Failed to open port and therefore stopped and removed container ${dbInfo.ContainerId}` };
+            }
 
             return {
                 success: true,
@@ -412,12 +434,15 @@ class BDDServices {
 
             if (command === "stop") {
                 await DockerService.stopContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+
+                await PortsCheck.suspendPort(rows[0].Port, false);
                 return {
                     ok: "ok",
                     data: "Database stopped successfully.",
                 };
             } else if (command === "start") {
                 await DockerService.startContainer(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
+                await PortsCheck.suspendPort(rows[0].Port, true);
                 const port = await DockerService.getContainerPorts(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
                 return {
                     ok: "ok",

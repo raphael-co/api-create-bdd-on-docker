@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import util from 'util';
 import * as net from 'net';
 import { DatabaseService } from '../DatabaseService/DatabaseService';
+import { PortsCheck } from '../PortsCheck/PortsCheck';
 
 const execCallback = util.promisify(exec);
 
@@ -18,42 +19,37 @@ export class DockerService {
     static async findAvailablePort(start: number, end: number): Promise<number> {
         const portIsOpen = async (port: number) => {
             return new Promise((resolve) => {
-                const server = net.createServer()
+                const server = net.createServer();
                 server.listen(port, () => {
                     server.once('close', () => {
-                        resolve(true)
-                    })
-                    server.close()
-                })
+                        resolve(true);
+                    });
+                    server.close();
+                });
                 server.on('error', () => {
-                    resolve(false)
-                })
-            })
-        }
+                    resolve(false);
+                });
+            });
+        };
 
         for (let port = start; port <= end; port++) {
-            if (await portIsOpen(port)) {
-                return port
-            }
-        }
-        throw new Error('No available ports found')
-    }
+            const isOpen = await portIsOpen(port);
+            const isAvailableExternally = await PortsCheck.checkPortAvailability(port);
+            const [rows] = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo WHERE Port = ${port}`);
 
-    private static portRange = {
-        postgres: [5501, 5600],
-        mariadb: [5601, 5700],
-    };
-
-    private static findNextAvailablePort(usedPorts: number[], type: DbType): number {
-        const range = this.portRange[type];
-        for (let port = range[0]; port <= range[1]; port++) {
-            if (!usedPorts.includes(port)) {
+            // Check if the port is open, available externally, and not found in the database
+            if (isOpen && isAvailableExternally && rows.length === 0) {
                 return port;
             }
         }
-        throw new Error(`No available ports found for ${type}`);
+        throw new Error('No available ports found');
     }
 
+
+    private static portRange = {
+        postgres: [10001, 10100],
+        mariadb: [10101, 10200],
+    };
 
     static async createContainer(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<{ success: boolean; containerId?: string; port?: number; error?: string }> {
         let dockerCommand = 'docker';
@@ -64,7 +60,7 @@ export class DockerService {
             return { success: false, error: "No available ports found." };
         }
 
-        let dockerArgs = await this.buildDockerArgs(name, type, config, dbVersion);
+        let dockerArgs = await this.buildDockerArgs(name, type, config, dbVersion, availablePort);
 
         try {
             const { stdout } = await execCallback(`${dockerCommand} ${dockerArgs.join(' ')}`);
@@ -99,14 +95,8 @@ export class DockerService {
         const match = portMappingOutput.match(regex);
         return match ? parseInt(match[1], 10) : 0;
     }
-    private static async buildDockerArgs(name: string, type: DbType, config: [string, string, string, string], dbVersion: string): Promise<string[]> {
+    private static async buildDockerArgs(name: string, type: DbType, config: [string, string, string, string], dbVersion: string, port: number): Promise<string[]> {
         let dockerArgs: string[];
-
-        const [rows] = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo`);
-        const usedPorts = rows.map((row: { Port: number; }) => Number(row.Port));
-
-        // Trouve le prochain port disponible
-        const availablePort = this.findNextAvailablePort(usedPorts, type);
 
         if (type === "postgres") {
             dockerArgs = [
@@ -114,7 +104,7 @@ export class DockerService {
                 '--env', 'POSTGRES_PASSWORD=' + config[0],
                 '--env', 'POSTGRES_USER=' + config[1],
                 '--env', 'POSTGRES_DB=' + config[2],
-                '-p', `${availablePort}:5432`, // Utilise le port disponible
+                '-p', `${port}:5432`, // Utilise le port disponible
                 '-d', `postgres:${dbVersion}`
             ];
         } else if (type === "mariadb") {
@@ -124,7 +114,7 @@ export class DockerService {
                 '--env', 'MARIADB_USER=' + config[1],
                 '--env', 'MARIADB_DATABASE=' + config[2],
                 '--env', 'MARIADB_ROOT_PASSWORD=' + config[3],
-                '-p', `${availablePort}:3306`, // Utilise le port disponible
+                '-p', `${port}:3306`, // Utilise le port disponible
                 '-d', `mariadb:${dbVersion}`
             ];
         } else {

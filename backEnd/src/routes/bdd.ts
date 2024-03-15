@@ -88,7 +88,6 @@ bdd.get('/', JsonWebToken.ValidToken, async (req: Request, res: Response) => {
         const result = await BDDServices.getAllBdd(decoded.decoded.id);
 
         const user = Array.isArray(result) ? result[0] : result;
-        console.log(user);
 
         res.status(201).send({ user: user });
     } catch (error: unknown) {
