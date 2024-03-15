@@ -9,7 +9,7 @@
             <hr />
             <div class="infoGeneral">
                 <span class="infoTitleGe">Hostname</span>
-                <span>{{ bddData?.Host ? bddData.Host : 'no name' }}</span>
+                <span>{{ 'raphael.netgraph.fr' }}</span>
             </div>
             <div class="infoGeneral">
                 <span class="infoTitleGe">Port</span>
@@ -48,10 +48,9 @@
                 <span class="infoTitleGe">External Database URL</span>
                 <span style="height: 100%; display: flex; text-align: center; width: 100%;">
                     <TextToggle v-if="bddData.type === 'postgres'"
-                        :text="bddData?.Password ? `postgresql://${bddData.Username}:${bddData.Password}@<External-IP-or-Domain>:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
-
+                        :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/:${bddData.DatabaseName}` : 'no name'" />
                     <TextToggle v-if="bddData.type === 'mariadb'"
-                        :text="bddData?.Password ? `mariadb://${bddData.Username}:${bddData.Password}@<External-IP-or-Domain>:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
+                    :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/:${bddData.DatabaseName}` : 'no name'" />
                 </span>
             </div>
 
