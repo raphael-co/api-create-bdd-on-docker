@@ -112,7 +112,7 @@ export class UserServices {
                 };
             }
 
-            console.log(users);
+            console.log('users :', users);
             
             const user = users;
 
