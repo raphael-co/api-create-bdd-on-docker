@@ -1,16 +1,16 @@
-// DatabaseService.ts
-import databaseConnectionPromise from "../../config/dbConnection";
-import databaseSecretKeyConnectionPromise from "../../config/dbSecretConfig";
-
+import pool from "../../config/dbConnection";
+import poolSecret from "../../config/dbSecretConfig";
 
 export class DatabaseService {
+
     static async queryDatabase(query: string, params: any[] = []): Promise<any> {
-        const conn = await databaseConnectionPromise;
-        return conn.query(query, params);
+        const result = await pool.query(query, params);
+        const [rows, fields] = result;
+        return rows;
     }
 
     static async querySecretDatabase(query: string, params: any[] = []): Promise<any> {
-        const conn = await databaseSecretKeyConnectionPromise;
-        return conn.query(query, params);
+        const [rows, fields] = await poolSecret.query(query, params);
+        return rows; 
     }
 }

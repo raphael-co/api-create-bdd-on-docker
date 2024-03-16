@@ -29,9 +29,10 @@ class BDDServices {
         };
 
         try {
-            const [rows] = await DatabaseService.querySecretDatabase(
+            const rows = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [id]
             );
+            
             if (rows.length > 0) {
                 secretKey = JSON.parse(rows[0].secretKey);
             } else {
@@ -53,11 +54,11 @@ class BDDServices {
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
 
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const rows = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
 
-            if (rows.length === 0) {
+            if (rows[0].length === 0) {
                 throw new Error('Database info not found.');
             }
 
@@ -95,11 +96,11 @@ class BDDServices {
         };
 
         try {
-            const [rows] = await DatabaseService.querySecretDatabase(
+            const rows = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [id]
             );
 
-            if (rows.length === 0) throw new Error('Secret key not found.');
+            if (rows[0].length === 0) throw new Error('Secret key not found.');
             secretKey = JSON.parse(rows[0].secretKey);
         } catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
@@ -118,10 +119,10 @@ class BDDServices {
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
 
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const rows = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [id, userid]
             );
-            if (rows.length === 0) throw new Error('Database info not found.');
+            if (rows[0].length === 0) throw new Error('Database info not found.');
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
             const storageRemaining = await DockerService.getContainerStorageUsed(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
@@ -160,7 +161,7 @@ class BDDServices {
 
     static async getAllBdd(userid: number) {
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const rows = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE UserId = ?`, [userid]
             );
 
@@ -172,11 +173,11 @@ class BDDServices {
                 };
             }
 
-            const bdds = await Promise.all(rows.map(async (row: { id: any; Name: string; Type: string; DatabaseName: string; Username: string; Password: string; ContainerId: string; Port: string; Host: string; VersionBdd: string }) => {
-                const [secretRows] = await DatabaseService.querySecretDatabase(
+            const bdds = await Promise.all(rows.map(async (row: { id: any; Name: string; Type: string; DatabaseName: string; Username: string; Password: string; ContainerId: string; Port: string; Host: string; VersionBdd: string, Create_at: string }) => {
+                const secretRows = await DatabaseService.querySecretDatabase(
                     `SELECT * FROM secretKey WHERE idBdd = ?`, [row.id]
                 );
-                if (secretRows.length === 0) {
+                if (secretRows[0].length === 0) {
                     throw new Error(`Secret key not found for database with ID ${row.id}.`);
                 }
 
@@ -214,11 +215,12 @@ class BDDServices {
                     Port: JSON.parse(row.Port),
                     Host: Cryptage.decrypt(JSON.parse(row.Host), keyBuffer),
                     VersionBdd: Cryptage.decrypt(JSON.parse(row.VersionBdd), keyBuffer),
-                    createAt: rows[0].Create_at,
+                    createAt: row.Create_at,
                     StorageRemaining: storageRemaining,
                     bddRun: bddRun
                 };
             }));
+            
             return {
                 ok: "ok",
                 data: bdds
@@ -295,7 +297,7 @@ class BDDServices {
 
             const query = `INSERT INTO bddInfo (UserId,Username, Password, DatabaseName, Port, Host, Type, ContainerId, Name,VersionBdd,Address,HashAdress) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`;
 
-            const [insertResults] = await DatabaseService.queryDatabase(query, values);
+            const insertResults = await DatabaseService.queryDatabase(query, values);
 
             let id = insertResults.insertId;
 
@@ -343,11 +345,11 @@ class BDDServices {
         };
 
         try {
-            const [rows] = await DatabaseService.querySecretDatabase(
+            const rows = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [bddId]
             );
 
-            if (rows.length === 0) throw new Error('Secret key not found.');
+            if (rows[0].length === 0) throw new Error('Secret key not found.');
             secretKey = JSON.parse(rows[0].secretKey);
         } catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
@@ -366,10 +368,10 @@ class BDDServices {
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
 
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const rows = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [bddId, userid]
             );
-            if (rows.length === 0) throw new Error('Database info not found.');
+            if (rows[0].length === 0) throw new Error('Database info not found.');
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
 
@@ -402,11 +404,11 @@ class BDDServices {
         };
 
         try {
-            const [rows] = await DatabaseService.querySecretDatabase(
+            const rows = await DatabaseService.querySecretDatabase(
                 `SELECT * FROM secretKey WHERE idBdd = ?`, [bddId]
             );
 
-            if (rows.length === 0) throw new Error('Secret key not found.');
+            if (rows[0].length === 0) throw new Error('Secret key not found.');
             secretKey = JSON.parse(rows[0].secretKey);
         } catch (error) {
             const errorMessage = (error instanceof Error) ? error.message : 'An unknown error occurred';
@@ -425,10 +427,10 @@ class BDDServices {
         const secretKeyDbInfo = Cryptage.decrypt(secretKey, secretKeyBuffer);
 
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const rows = await DatabaseService.queryDatabase(
                 `SELECT * FROM bddInfo WHERE id = ? AND UserId = ?`, [bddId, userid]
             );
-            if (rows.length === 0) throw new Error('Database info not found.');
+            if (rows[0].length === 0) throw new Error('Database info not found.');
 
             const keyBuffer = Buffer.from(JSON.parse(secretKeyDbInfo).data);
 

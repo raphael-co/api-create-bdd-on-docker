@@ -35,8 +35,8 @@ export class DockerService {
         for (let port = start; port <= end; port++) {
             const isOpen = await portIsOpen(port);
             const isAvailableExternally = await PortsCheck.checkPortAvailability(port);
-            const [rows] = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo WHERE Port = ${port}`);
-
+            const rows = await DatabaseService.queryDatabase(`SELECT Port FROM bddInfo WHERE Port = ${port}`);
+            
             // Check if the port is open, available externally, and not found in the database
             if (isOpen && isAvailableExternally && rows.length === 0) {
                 return port;

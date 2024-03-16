@@ -65,17 +65,19 @@ export class UserServices {
         const hashedPassword = await HashPassword.hashPassword(password);
         mail = mail.toLowerCase();
         try {
-            const [rows] = await DatabaseService.queryDatabase(
+            const result = await DatabaseService.queryDatabase(
                 "INSERT INTO `users` (`id`, `mail`, `password`) VALUES (?, ?, ?)", [id, mail, hashedPassword]
             );
 
-            const token = JsonwebtokenController.generateJwtToken(rows.insertId);
+            console.log(result);
+            
+            const token = JsonwebtokenController.generateJwtToken(result.insertId);
 
             return {
                 success: true,
                 message: "User successfully registered.",
                 userDetails: {
-                    id: rows.insertId,
+                    id: result.insertId,
                     mail: mail,
                     hashedPassword: hashedPassword 
                 },
@@ -91,6 +93,10 @@ export class UserServices {
     };
     static login = async (userData: any) => {
         let { mail, password } = userData;
+
+        console.log(userData);
+        console.log(password);
+        
         mail = mail.toLowerCase();
         try {
             const [users] = await DatabaseService.queryDatabase(
@@ -104,7 +110,12 @@ export class UserServices {
                 };
             }
 
-            const user = users[0];
+            console.log(users);
+            
+            const user = users;
+
+            console.log(user.password);
+            
             const passwordMatch = await HashPassword.comparePassword(password, user.password);
 
             if (!passwordMatch) {

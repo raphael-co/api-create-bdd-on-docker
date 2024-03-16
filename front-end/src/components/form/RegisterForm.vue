@@ -8,6 +8,9 @@
 
       <InputComponent label="Confirm the password" v-model="credentials.confirmPassword"
         placeholder="Entrez du confirmPassword" />
+
+        <InputComponent label="token admin" v-model="credentials.tokenAdmin"
+        placeholder="Entrez le tokenAdmin" />
  
       <button class="btnRegister" type="submit">Register</button>
       <p>You have an account? <a class="goRegister" href="/login">Sign Up</a></p>
@@ -30,7 +33,8 @@ export default {
       credentials: {
         mail: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        tokenAdmin: '',
       },
       router
     };
