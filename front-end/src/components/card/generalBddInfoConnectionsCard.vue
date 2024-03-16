@@ -38,19 +38,19 @@
                 <span class="infoTitleGe">Internal Database URL</span>
                 <span style="height: 100%; display: flex; text-align: center; width: 100%;">
                     <TextToggle v-if="bddData.type === 'postgres'"
-                        :text="bddData?.Password ? `postgresql://${bddData.Username}:${bddData.Password}@${bddData.Host}:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
+                        :text="bddData?.Password ? `postgresql://${bddData.Username}:${bddData.Password}@raphael.netgraph.fr:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
 
                     <TextToggle v-if="bddData.type === 'mariadb'"
-                        :text="bddData?.Password ? `mariadb://${bddData.Username}:${bddData.Password}@${bddData.Host}:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
+                        :text="bddData?.Password ? `mariadb://${bddData.Username}:${bddData.Password}@raphael.netgraph.fr:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
                 </span>
             </div>
             <div class="infoGeneral">
                 <span class="infoTitleGe">External Database URL</span>
                 <span style="height: 100%; display: flex; text-align: center; width: 100%;">
                     <TextToggle v-if="bddData.type === 'postgres'"
-                        :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/:${bddData.DatabaseName}` : 'no name'" />
+                        :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
                     <TextToggle v-if="bddData.type === 'mariadb'"
-                    :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/:${bddData.DatabaseName}` : 'no name'" />
+                    :text="bddData?.Password ? `raphael.netgraph.fr:${bddData.Port}/${bddData.DatabaseName}` : 'no name'" />
                 </span>
             </div>
 
@@ -59,10 +59,10 @@
                 <span v-if="bddData.type === 'mariadb'" class="infoTitleGe">MYSQL Command</span>
                 <span style="height: 100%; display: flex; text-align: center; width: 100%;">
                     <TextToggle v-if="bddData.type === 'postgres'"
-                        :text="bddData?.Password ? `psql -h ${bddData.Host} -p ${bddData.Port} -U ${bddData.Username} -d ${bddData.DatabaseName} -W` : 'no name'" />
+                        :text="bddData?.Password ? `psql -h raphael.netgraph.fr -p ${bddData.Port} -U ${bddData.Username} -d ${bddData.DatabaseName} -W` : 'no name'" />
 
                     <TextToggle v-if="bddData.type === 'mariadb'"
-                        :text="bddData?.Password ? `mysql -h ${bddData.Host} -u ${bddData.Username} -p ${bddData.Password} ${bddData.Port} -D ${bddData.DatabaseName}` : 'no name'" />
+                        :text="bddData?.Password ? `mysql -h raphael.netgraph.fr -u ${bddData.Username} -p ${bddData.Password} ${bddData.Port} -D ${bddData.DatabaseName}` : 'no name'" />
                 </span>
             </div>
         </div>

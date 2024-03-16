@@ -379,6 +379,7 @@ class BDDServices {
 
             const port = await DockerService.getContainerPorts(Cryptage.decrypt(JSON.parse(rows[0].ContainerId), keyBuffer));
 
+            await PortsCheck.suspendPort(rows[0].Port, true);
             return {
                 ok: "ok",
                 data: "Database restarted successfully.",
