@@ -105,7 +105,7 @@ export class UserServices {
 
             console.log(users);
             
-            if (users.length === 0) {
+            if (users === undefined || users.length === 0 || users[0].length === 0 || users[0] === undefined || users[0] === null || users === null) {
                 return {
                     success: false,
                     message: "User not found."
