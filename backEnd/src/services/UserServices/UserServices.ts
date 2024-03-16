@@ -103,6 +103,8 @@ export class UserServices {
                 "SELECT * FROM `users` WHERE `mail` = ?", [mail]
             );
 
+            console.log(users);
+            
             if (users.length === 0) {
                 return {
                     success: false,
