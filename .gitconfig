@@ -1,0 +1,2 @@
+[alias]
+    pushAll = "!git push origin $(git branch --show-current) && git push upstream $(git branch --show-current)"
