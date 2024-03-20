@@ -15,6 +15,7 @@ node_modules/
 logs/
 *.log
 
+*/cert
 # Ignore les fichiers de configuration de l'environnement
 .env
 
