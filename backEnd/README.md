@@ -11,4 +11,4 @@
 # lancer le server en dev local sur son post :
     npm run dev 
 # build le server :
-    npm run build 
+    npm run build
