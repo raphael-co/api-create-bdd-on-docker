@@ -28,5 +28,5 @@ logs/
 *.tmp
 
 # Ignore les dépendances installées
-package-lock.json
-.package-lock.json
+# package-lock.json
+# .package-lock.json
