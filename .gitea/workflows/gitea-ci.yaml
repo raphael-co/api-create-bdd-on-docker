@@ -2,10 +2,11 @@ name: Gitea Actions Demo
 run-name: ${{ gitea.actor }} is testing out Gitea Actions 🚀
 on: [push]
 
+
 jobs:
   build-backend:
     runs-on: ubuntu-latest
-    steps:
+    steps: 
       - uses: https://github.com/actions/checkout@v4
       - name: Use Node.js
         uses: https://github.com/actions/setup-node@v3
