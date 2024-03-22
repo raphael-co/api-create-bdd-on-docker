@@ -11,6 +11,7 @@ jobs:
         uses: https://github.com/actions/setup-node@v3
         with:
           node-version: '21.5.0'
+        working-directory: ./backend
       - run: npm ci
       - run: npm run build
         env:
