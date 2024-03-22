@@ -11,15 +11,15 @@ jobs:
         uses: https://github.com/actions/setup-node@v3
         with:
           node-version: '21.5.0'
-        working-directory: ./backend
+        working-directory: ./backEnd
       - run: |
           if [ ! -f package-lock.json ]; then
             npm install
           fi
-        working-directory: ./backend
+        working-directory: ./backEnd
       - run: npm ci
-        working-directory: ./backend
+        working-directory: ./backEnd
       - run: npm run build
-        working-directory: ./backend
+        working-directory: ./backEnd
         env:
           NODE_OPTIONS: --max_old_space_size=4096
